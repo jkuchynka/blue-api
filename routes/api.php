@@ -24,6 +24,7 @@ Route::group([
 ], function () {
     Route::post('auth/login', 'AuthController@login');
     Route::get('auth/logout', 'AuthController@logout');
+    Route::post('auth/register', 'AuthController@register');
     Route::post('auth/validate-verify', 'AuthController@validVerify');
     Route::post('auth/verify', 'AuthController@verify');
 });

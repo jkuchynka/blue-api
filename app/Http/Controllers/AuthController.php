@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Spatie\UrlSigner\MD5UrlSigner;
 use JWTAuth;
 use Auth;
 use App\User;
+use App\Mail\Auth\Verify;
 
 class AuthController extends Controller
 {
@@ -44,6 +47,30 @@ class AuthController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Publically registers a user.
+     * Workflow is:
+     * Store as new user with just email
+     * Send verify email
+     * Verify validates user account and captures new password and name
+     * User can then login with password
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users'
+        ]);
+        $user = User::create([
+            'email' => $request->email,
+            'password' => bcrypt(Str::random(10))
+        ]);
+        // $user->save();
+        Mail::to([
+            ['email' => $user->email]
+        ])->send(new Verify($user));
+        return response()->json($user);
     }
 
     /**
