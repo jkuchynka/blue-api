@@ -17,3 +17,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Unauthed routes
+Route::group([
+
+], function () {
+    Route::post('auth/login', 'AuthController@login');
+    Route::get('auth/logout', 'AuthController@logout');
+    Route::post('auth/validate-verify', 'AuthController@validVerify');
+    Route::post('auth/verify', 'AuthController@verify');
+});
