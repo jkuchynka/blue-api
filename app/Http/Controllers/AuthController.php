@@ -74,18 +74,60 @@ class AuthController extends Controller
     }
 
     /**
-     * Validates a verify signed url, and that
-     * the user hasn't validated yet.
+     * Send reset password link to user's email
+     */
+    public function requestReset(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+        $user = User::where('email', $request->email)->firstOrFail();
+        $verify = new Verify($user);
+        $verify->setType('reset');
+        Mail::to([
+            ['email' => $user->email]
+        ])->send($verify);
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    /**
+     * Reset user's password
+     */
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:6',
+            'password_confirm' => 'required|same:password',
+            'url' => 'required'
+        ]);
+        $valid = $this->validateUrl($request->url);
+        $user = $this->getUserFromSignedUrl($request->url);
+        if ($valid && $user) {
+            $user->password = bcrypt($request->password);
+            $user->markEmailAsVerified();
+            return response()->json([
+                'message' => 'User email verified and password set.'
+            ]);
+        }
+        return response()->json([
+            'message' => 'Invalid URL'
+        ], 422);
+    }
+
+    /**
+     * Validates a verify signed url, used for validating
+     * new users and reset passwords
      */
     public function validVerify(Request $request)
     {
         $request->validate([
             'url' => 'required'
         ]);
-        $signer = new MD5UrlSigner(Config::get('app.url_sign_secret'));
-        $valid = $signer->validate($request->url);
+        $valid = $this->validateUrl($request->url);
         $user = $this->getUserFromSignedUrl($request->url);
-        if ($valid && $user && ! $user->email_verified_at) {
+        if ($valid && $user) {
             return response()->json([
                 'message' => 'URL is valid.'
             ]);
@@ -106,8 +148,9 @@ class AuthController extends Controller
             'password_confirm' => 'required|same:password',
             'url' => 'required'
         ]);
+        $valid = $this->validateUrl($request->url);
         $user = $this->getUserFromSignedUrl($request->url);
-        if ( ! $user->email_verified_at) {
+        if ($valid && $user) {
             $user->password = bcrypt($request->password);
             $user->markEmailAsVerified();
             return response()->json([
@@ -119,11 +162,17 @@ class AuthController extends Controller
         ], 422);
     }
 
-    protected function getUserFromSignedUrl ($url)
+    protected function getUserFromSignedUrl($url)
     {
         $parts = explode('/', explode('?', $url)[0]);
         $userId = array_pop($parts);
         $user = User::find($userId);
         return $user;
+    }
+
+    protected function validateUrl($url)
+    {
+        $signer = new MD5UrlSigner(Config::get('app.url_sign_secret'));
+        return $signer->validate($url);
     }
 }

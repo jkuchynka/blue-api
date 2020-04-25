@@ -15,6 +15,7 @@ class Verify extends Mailable
     use Queueable, SerializesModels;
 
     protected $user;
+    protected $type = 'verify';
 
     /**
      * Create a new message instance.
@@ -26,6 +27,11 @@ class Verify extends Mailable
         $this->user = $user;
     }
 
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
     /**
      * Build the message.
      *
@@ -33,16 +39,16 @@ class Verify extends Mailable
      */
     public function build()
     {
-        $url = rtrim(Config::get('app.url'), '/') . '/auth/verify/' . $this->user->id;
+        $url = rtrim(Config::get('app.url'), '/') . '/verify/' . $this->type . '/' . $this->user->id;
 
         $signer = new MD5UrlSigner(Config::get('app.url_sign_secret'));
 
         $verifyUrl = $signer->sign($url, 10);
 
-        return $this->view('emails.auth.verify')
+        return $this->view('emails.auth.' . $this->type)
             ->with([
-                'name' => $this->user->name,
-                'verifyUrl' => $verifyUrl
+                'verifyUrl' => $verifyUrl,
+                'user' => $this->user
             ]);
     }
 }
