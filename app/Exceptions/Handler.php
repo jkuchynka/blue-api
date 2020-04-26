@@ -41,6 +41,8 @@ class Handler extends ExceptionHandler
 
     /**
      * Render an exception into an HTTP response.
+     * Throw exception or return api json response based on env setting
+     * Log exception if enabled in env
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $exception
@@ -50,6 +52,9 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
+        if (env('APP_HANDLE_EXCEPTIONS', true)) {
+            return parent::render($request, $exception);
+        }
+        throw $exception;
     }
 }
