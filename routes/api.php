@@ -29,4 +29,5 @@ Route::group([
     Route::post('auth/reset', 'AuthController@reset');
     Route::post('auth/validate-verify', 'AuthController@validVerify');
     Route::post('auth/verify', 'AuthController@verify');
+    Route::post('contact', 'ContactMessagesController@store');
 });
