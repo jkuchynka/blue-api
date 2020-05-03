@@ -4,67 +4,79 @@ namespace App\Users\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
+use Base\Tests\TestCase;
 use App\Users\User;
 
 class UsersApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $users = [];
+
+    protected function beforeTest()
+    {
+        $this->users[] = factory(User::class)->create([
+            'name' => 'donald',
+            'email' => 'donald.duck@mail.net'
+        ]);
+        $this->users[] = factory(User::class)->create([
+            'name' => 'duey',
+            'email' => 'quack@gmail.com'
+        ]);
+        $this->users[] = factory(User::class)->create([
+            'name' => 'scrooge',
+            'email' => 'moneybags@example.org'
+        ]);
+    }
+
     public function testGetUsersReturnsAll()
     {
-        $headers = [];
-        $users = factory(User::class, 3)->create();
-        $response = $this->json('GET', '/api/users', [], $headers)
+        $response = $this->json('GET', '/api/users')
             ->assertStatus(200)
             // Records should be in data
-            ->assertJsonPath('data.0.id', $users[0]->id)
-            ->assertJsonPath('data.1.name', $users[1]->name)
-            ->assertJsonPath('data.2.email', $users[2]->email);
+            ->assertJsonPath('data.0.id', $this->users[0]->id)
+            ->assertJsonPath('data.1.name', $this->users[1]->name)
+            ->assertJsonPath('data.2.email', $this->users[2]->email);
     }
 
     public function testGetUsersFilterField()
     {
-        $user = factory(User::class)->create([
-            'name' => 'Foobar',
-            'email' => 'test1@mail.net'
-        ]);
-        $user2 = factory(User::class)->create([
-            'name' => 'Bazqux',
-            'email' => 'test2@mail.net'
-        ]);
-        $response = $this->json('GET', '/api/users?filter[name]=qux');
+        $response = $this->json('GET', '/api/users?filter[name]=donald');
         $response
-            ->assertJsonPath('data.0.name', 'Bazqux')
+            ->assertJsonPath('data.0.name', 'donald')
             ->assertJsonPath('total', 1);
-        $response = $this->json('GET', '/api/users?filter[email]=test1');
+        $response = $this->json('GET', '/api/users?filter[email]=quack');
         $response
-            ->assertJsonPath('data.0.name', 'Foobar')
+            ->assertJsonPath('data.0.name', 'duey')
             ->assertJsonPath('total', 1);
-        $response = $this->json('GET', '/api/users?filter[name]=snoopy')
+        $response = $this->json('GET', '/api/users?filter[name]=foobar')
             ->assertJsonPath('data', [])
             ->assertJsonPath('total', 0);
     }
 
     public function testGetUsersSearchFields()
     {
-        $user = factory(User::class)->create([
-            'name' => 'Foobar',
-            'email' => 'test1@mail.net'
-        ]);
-        $user2 = factory(User::class)->create([
-            'name' => 'Bazqux',
-            'email' => 'test2@mail.net'
-        ]);
-        $response = $this->json('GET', '/api/users?filter[all]=bar');
-        $this->debugJson($response);
+        $response = $this->json('GET', '/api/users?filter[all]=duck');
         $response
-            ->assertJsonPath('data.0.name', 'Foobar')
+            ->assertJsonPath('data.0.name', 'donald')
+            ->assertJsonPath('total', 1);
+        $response = $this->json('GET', '/api/users?filter[all]=roo');
+        $response
+            ->assertJsonPath('data.0.name', 'scrooge')
             ->assertJsonPath('total', 1);
     }
 
-    public function _testGetUsersSorts()
+    public function testGetUsersSorts()
     {
-
+        $response = $this->json('GET', '/api/users?sort=email');
+        $response
+            ->assertJsonPath('data.0.name', 'donald')
+            ->assertJsonPath('data.1.name', 'scrooge')
+            ->assertJsonPath('data.2.name', 'duey');
+        $response = $this->json('GET', '/api/users?sort=-email');
+        $response
+            ->assertJsonPath('data.0.name', 'duey')
+            ->assertJsonPath('data.1.name', 'scrooge')
+            ->assertJsonPath('data.2.name', 'donald');
     }
 }

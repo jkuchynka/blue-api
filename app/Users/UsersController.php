@@ -6,10 +6,10 @@ use App\Users\User;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use App\Base\Http\Filters\FiltersAll;
-use App\Mail\Auth\Verify;
+use Base\Http\Filters\FiltersAll;
+use App\Auth\Verify;
 
-class UsersController extends \App\Base\Http\Controller
+class UsersController extends \Base\Http\Controller
 {
     /**
      * Display a listing of the resource.

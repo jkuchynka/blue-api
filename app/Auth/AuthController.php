@@ -10,7 +10,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Spatie\UrlSigner\MD5UrlSigner;
 use JWTAuth;
 use Auth;
-use App\User;
+use App\Users\User;
 use App\Mail\Auth\Verify;
 
 class AuthController extends Controller
