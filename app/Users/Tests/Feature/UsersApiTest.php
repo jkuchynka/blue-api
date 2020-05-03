@@ -23,9 +23,44 @@ class UsersApiTest extends TestCase
             ->assertJsonPath('data.2.email', $users[2]->email);
     }
 
-    public function _testGetUsersFilters()
+    public function testGetUsersFilterField()
     {
+        $user = factory(User::class)->create([
+            'name' => 'Foobar',
+            'email' => 'test1@mail.net'
+        ]);
+        $user2 = factory(User::class)->create([
+            'name' => 'Bazqux',
+            'email' => 'test2@mail.net'
+        ]);
+        $response = $this->json('GET', '/api/users?filter[name]=qux');
+        $response
+            ->assertJsonPath('data.0.name', 'Bazqux')
+            ->assertJsonPath('total', 1);
+        $response = $this->json('GET', '/api/users?filter[email]=test1');
+        $response
+            ->assertJsonPath('data.0.name', 'Foobar')
+            ->assertJsonPath('total', 1);
+        $response = $this->json('GET', '/api/users?filter[name]=snoopy')
+            ->assertJsonPath('data', [])
+            ->assertJsonPath('total', 0);
+    }
 
+    public function testGetUsersSearchFields()
+    {
+        $user = factory(User::class)->create([
+            'name' => 'Foobar',
+            'email' => 'test1@mail.net'
+        ]);
+        $user2 = factory(User::class)->create([
+            'name' => 'Bazqux',
+            'email' => 'test2@mail.net'
+        ]);
+        $response = $this->json('GET', '/api/users?filter[all]=bar');
+        $this->debugJson($response);
+        $response
+            ->assertJsonPath('data.0.name', 'Foobar')
+            ->assertJsonPath('total', 1);
     }
 
     public function _testGetUsersSorts()

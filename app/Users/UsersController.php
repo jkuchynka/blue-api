@@ -21,7 +21,7 @@ class UsersController extends \App\Base\Http\Controller
         $results = QueryBuilder::for(User::class)
             ->allowedFilters([
                 'name', 'email',
-                AllowedFilter::custom('all', new FiltersAll)
+                AllowedFilter::custom('all', new FiltersAll(['name', 'email']))
             ])
             ->allowedSorts([
                 'id', 'name', 'email'
