@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.5",
+        "adbario/php-dot-notation": "^2.2",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
@@ -17,11 +18,13 @@
         "spatie/laravel-json-api-paginate": "^1.6",
         "spatie/laravel-query-builder": "^2.5",
         "spatie/url-signer": "^1.0",
+        "symfony/yaml": "^5.0",
         "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
         "fzaninotto/faker": "^1.9.1",
+        "mikey179/vfsstream": "^1.6",
         "mockery/mockery": "^1.3.1",
         "nunomaduro/collision": "^4.1",
         "phpunit/phpunit": "^8.5"

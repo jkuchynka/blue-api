@@ -2,79 +2,138 @@
 
 namespace Base\Providers;
 
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Adbar\Dot;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Traits\ForwardsCalls;
+use Base\Services\Modules;
 
+/**
+ * @mixin \Illuminate\Routing\Router
+ */
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * This namespace is applied to your controller routes.
-     *
-     * In addition, it is set as the URL generator's root namespace.
-     *
-     * @var string
-     */
-    protected $namespace = 'App\Http\Controllers';
+    use ForwardsCalls;
+
+    protected $modules;
 
     /**
-     * The path to the "home" route for your application.
+     * The controller namespace for the application.
      *
-     * @var string
+     * @var string|null
      */
-    public const HOME = '/home';
+    protected $namespace;
 
     /**
-     * Define your route model bindings, pattern filters, etc.
+     * Bootstrap any application services.
      *
      * @return void
      */
-    public function boot()
+    public function boot(Modules $modules)
     {
-        //
+        $this->modules = $modules;
 
-        parent::boot();
+        $this->setRootControllerNamespace();
+
+        if ($this->routesAreCached()) {
+            $this->loadCachedRoutes();
+        } else {
+            $this->loadRoutes();
+
+            $this->app->booted(function () {
+                $this->app['router']->getRoutes()->refreshNameLookups();
+                $this->app['router']->getRoutes()->refreshActionLookups();
+            });
+        }
     }
 
     /**
-     * Define the routes for the application.
+     * Set the root controller namespace for the application.
      *
      * @return void
      */
-    public function map()
+    protected function setRootControllerNamespace()
     {
-        $this->mapApiRoutes();
-
-        $this->mapWebRoutes();
-
-        //
+        if (! is_null($this->namespace)) {
+            $this->app[UrlGenerator::class]->setRootControllerNamespace($this->namespace);
+        }
     }
 
     /**
-     * Define the "web" routes for the application.
+     * Determine if the application routes are cached.
      *
-     * These routes all receive session state, CSRF protection, etc.
-     *
-     * @return void
+     * @return bool
      */
-    protected function mapWebRoutes()
+    protected function routesAreCached()
     {
-        Route::middleware('web')
-            ->namespace($this->namespace)
-            ->group(base_path('routes/web.php'));
+        return $this->app->routesAreCached();
     }
 
     /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
+     * Load the cached routes for the application.
      *
      * @return void
      */
-    protected function mapApiRoutes()
+    protected function loadCachedRoutes()
     {
-        Route::prefix('api')
-            ->middleware('api')
-            // ->namespace($this->namespace)
-            ->group(base_path('routes/api.php'));
+        $this->app->booted(function () {
+            require $this->app->getCachedRoutesPath();
+        });
+    }
+
+    /**
+     * Load the application routes.
+     *
+     * @return void
+     */
+    protected function loadRoutes()
+    {
+        $modules = $this->modules->getModules();
+        foreach ($modules as $key => $config) {
+            $module = new Dot($config);
+            $routes = $module->get('routes', []);
+            $namespace = $module['namespace'];
+            if ($module['paths.controllers']) {
+                $namespace .= '\\' . $module['paths.controllers'];
+            }
+            Route::group([
+                'as' => $module['key'],
+                'namespace' => $namespace,
+                'middleware' => 'api'
+            ], function () use ($module, $routes) {
+                $prefix = $module->get('routesPrefix', $module['key']);
+                foreach ($routes as $route) {
+                    $method = isset($route['method']) ? strtolower($route['method']) : 'get';
+                    $name = isset($route['name']) ? $route['name'] : 'index';
+                    $controller = isset($route['controller']) ? $route['controller'] : $module['name'] . 'Controller';
+                    $function = isset($route['function']) ? $route['function'] : 'get';
+                    // $namespace = $module['namespace'] . '\\' . $module['paths.controllers'];
+                    // Prefix relative route URIs
+                    $uri = $route['route'];
+                    if ($uri[0] !== '/') {
+                        $uri = $prefix . '/' . $uri;
+                    }
+                    Route::get($uri, [
+                        'as' => '.' . $name,
+                        'uses' => $controller . '@' . $function,
+                       //  'namespace' => $namespace
+                    ]);
+                }
+            });
+        }
+    }
+
+    /**
+     * Pass dynamic methods onto the router instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallTo(
+            $this->app->make(Router::class), $method, $parameters
+        );
     }
 }
