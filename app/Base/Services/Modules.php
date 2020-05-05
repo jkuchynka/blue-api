@@ -94,10 +94,13 @@ class Modules
                 'factories' => 'Database/Factories',
                 'seeds' => 'Database/Seeds',
                 'controllers' => 'Http/Controllers'
-            ]
+            ],
+            'routesPrefix' => $key,
+            'routes' => []
         ];
         $config['paths']['module'] = $this->getModulesPath() . '/' . $config['name'];
         $config['namespace'] = $key === 'base' ? 'Base' : 'App\\' . $config['name'];
+        $config['routesController'] = $config['name'] . 'Controller';
         return $config;
     }
 

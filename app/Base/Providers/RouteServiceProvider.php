@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Base\Services\Modules;
+use Base\Services\Routes;
 
 /**
  * @mixin \Illuminate\Routing\Router
@@ -25,6 +26,13 @@ class RouteServiceProvider extends ServiceProvider
     protected $namespace;
 
     /**
+     * Whether to load routes, useful for testing
+     *
+     * @var boolean
+     */
+    protected static $loadRoutes = true;
+
+    /**
      * Bootstrap any application services.
      *
      * @return void
@@ -34,6 +42,10 @@ class RouteServiceProvider extends ServiceProvider
         $this->modules = $modules;
 
         $this->setRootControllerNamespace();
+
+        if ( ! static::$loadRoutes) {
+            return;
+        }
 
         if ($this->routesAreCached()) {
             $this->loadCachedRoutes();
@@ -45,6 +57,11 @@ class RouteServiceProvider extends ServiceProvider
                 $this->app['router']->getRoutes()->refreshActionLookups();
             });
         }
+    }
+
+    public static function setLoadRoutes(bool $load)
+    {
+        static::$loadRoutes = $load;
     }
 
     /**
@@ -89,38 +106,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function loadRoutes()
     {
         $modules = $this->modules->getModules();
-        foreach ($modules as $key => $config) {
-            $module = new Dot($config);
-            $routes = $module->get('routes', []);
-            $namespace = $module['namespace'];
-            if ($module['paths.controllers']) {
-                $namespace .= '\\' . $module['paths.controllers'];
-            }
-            Route::group([
-                'as' => $module['key'],
-                'namespace' => $namespace,
-                'middleware' => 'api'
-            ], function () use ($module, $routes) {
-                $prefix = $module->get('routesPrefix', $module['key']);
-                foreach ($routes as $route) {
-                    $method = isset($route['method']) ? strtolower($route['method']) : 'get';
-                    $name = isset($route['name']) ? $route['name'] : 'index';
-                    $controller = isset($route['controller']) ? $route['controller'] : $module['name'] . 'Controller';
-                    $function = isset($route['function']) ? $route['function'] : 'get';
-                    // $namespace = $module['namespace'] . '\\' . $module['paths.controllers'];
-                    // Prefix relative route URIs
-                    $uri = $route['route'];
-                    if ($uri[0] !== '/') {
-                        $uri = $prefix . '/' . $uri;
-                    }
-                    Route::get($uri, [
-                        'as' => '.' . $name,
-                        'uses' => $controller . '@' . $function,
-                       //  'namespace' => $namespace
-                    ]);
-                }
-            });
-        }
+        $routes = new Routes($modules);
+        $routes->loadRoutes();
     }
 
     /**
