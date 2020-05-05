@@ -12,7 +12,7 @@ class Routes
 {
     protected $modulesConfig;
 
-    public function __construct(Dot $modulesConfig)
+    public function __construct(array $modulesConfig = [])
     {
         $this->modulesConfig = $modulesConfig;
     }
@@ -21,8 +21,7 @@ class Routes
     {
         $prefix = config('modules.routes.prefix');
         $middleware = config('modules.routes.middleware');
-        foreach ($this->modulesConfig as $key => $config) {
-            $module = new Dot($config);
+        foreach ($this->modulesConfig as $key => $module) {
             $routes = $module->get('routes', []);
 
             // Add module routes as group

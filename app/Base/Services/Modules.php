@@ -9,13 +9,12 @@ use Symfony\Component\Yaml\Yaml;
 
 class Modules
 {
-    protected $config;
+    protected $config = [];
     protected $configRepository;
     protected $yaml;
 
     public function __construct(Repository $config = null, Yaml $yaml = null)
     {
-        $this->config = new Dot;
         $this->configRepository = $config ? $config : new Repository;
         $this->yaml = $yaml ? $yaml : new Yaml;
     }
@@ -55,25 +54,26 @@ class Modules
     {
         // Setup each module's config from default, yaml and app level
         foreach ($this->getEnabledModules() as $key) {
-            $this->config[$key] = $this->moduleConfigDefault($key);
+            $config = new Dot($this->moduleConfigDefault($key));
 
             // Check config/modules settings for app level settings
             // These will override any yaml settings, except for module path
             $appConfig = $this->configRepository->get('modules.modules.' . $key, []);
 
             if (isset($appConfig['paths']) && isset($appConfig['paths']['module'])) {
-                $this->config[$key . '.paths.module'] = $appConfig['paths']['module'];
+                $config['paths.module'] = $appConfig['paths']['module'];
             }
 
             // Config from yaml
-            $filename = $this->config[$key . '.paths.module'] . '/' . $key . '.config.yml';
+            $filename = $config['paths.module'] . '/' . $key . '.config.yml';
 
             if (file_exists($filename)) {
                 $otherConfig = $this->yaml->parseFile($filename);
-                $this->config->mergeRecursiveDistinct($key, $otherConfig);
+                $config->mergeRecursiveDistinct($otherConfig);
             }
 
-            $this->config->mergeRecursiveDistinct($key, $appConfig);
+            $config->mergeRecursiveDistinct($appConfig);
+            $this->config[$key] = $config;
         }
     }
 
@@ -105,11 +105,22 @@ class Modules
     }
 
     /**
+     * Get a module
+     *
+     * @param  string $key
+     * @return Dot
+     */
+    public function getModule($key): Dot
+    {
+        return $this->config[$key];
+    }
+
+    /**
      * Get all enabled modules with configs
      *
      * @return Dot
      */
-    public function getModules(): Dot
+    public function getModules(): array
     {
         return $this->config;
     }

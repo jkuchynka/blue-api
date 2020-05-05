@@ -11,13 +11,6 @@ use Base\Services\Modules;
 
 class ModulesTest extends \Base\Tests\TestCase
 {
-
-    protected function beforeTest()
-    {
-        // $this->modules = $this->createStub(Modules::class);
-        // $this->modules->method('get_')
-    }
-
     public function test_get_enabled_modules()
     {
         $repo = new Repository([
@@ -31,6 +24,10 @@ class ModulesTest extends \Base\Tests\TestCase
         ]);
         $modules = new Modules($repo);
         $this->assertEquals(['foo', 'bar', 'baz'], $modules->getEnabledModules());
+        $modules->loadModules();
+        $config = $modules->getModules();
+        $this->assertIsArray($config);
+        $this->assertInstanceOf(Dot::class, $config['foo']);
     }
 
     public function test_get_module_config_default()
@@ -84,10 +81,10 @@ class ModulesTest extends \Base\Tests\TestCase
         $modules = new Modules($repo);
         $modules->loadModules();
         $config = $modules->getModules();
-        $this->assertInstanceOf(Dot::class, $config);
-        $this->assertEquals('foo', $config['foo.key']);
-        $this->assertEquals('Bar', $config['bar.name']);
-        $this->assertEquals('App\\Baz', $config['baz.namespace']);
+
+        $this->assertEquals('foo', $config['foo']['key']);
+        $this->assertEquals('Bar', $config['bar']['name']);
+        $this->assertEquals('App\\Baz', $config['baz']['namespace']);
     }
 
     public function test_load_modules_with_yaml_config()
@@ -114,10 +111,10 @@ paths:
             ->at($root);
         $modules = new Modules($repo);
         $modules->loadModules();
-        $config = $modules->getModules();
-        $this->assertEquals('123', $config['foo.version']);
-        $this->assertEquals('foobar', $config['foo.description']);
-        $this->assertEquals('db-migrations', $config['foo.paths.migrations']);
+        $foo = $modules->getModule('foo');
+        $this->assertEquals('123', $foo['version']);
+        $this->assertEquals('foobar', $foo['description']);
+        $this->assertEquals('db-migrations', $foo['paths.migrations']);
     }
 
     public function test_load_modules_with_app_config()
@@ -147,10 +144,10 @@ paths:
             ->at($root);
         $modules = new Modules($repo);
         $modules->loadModules();
-        $config = $modules->getModules();
-        $this->assertEquals('123.123', $config['foo.version']);
-        $this->assertEquals('Database', $config['foo.paths.migrations']);
-        $this->assertEquals('CTRL', $config['foo.paths.controllers']);
+        $foo = $modules->getModule('foo');
+        $this->assertEquals('123.123', $foo['version']);
+        $this->assertEquals('Database', $foo['paths.migrations']);
+        $this->assertEquals('CTRL', $foo['paths.controllers']);
     }
 
     public function test_load_module_routes_from_yaml()
@@ -179,21 +176,8 @@ routes:
         $modules = new Modules($repo);
         $modules->loadModules();
 
-        // Route is only in module config
-        $config = $modules->getModules();
-        $this->assertEquals('foo', $config['foo.routes.0.route']);
-
-        // $routeCollection = Route::getRoutes();
-
-        // // Adds prefix
-        // $route = $routeCollection->getByName('base.testing');
-        // $this->assertEquals('base/testing', $route->uri());
-
-        // // Base API route GET /
-        // $route = $routeCollection->getByName('base.index');
-        // $this->assertEquals('/', $route->uri());
-        // $response = $this->json('GET', '/');
-        // $response->assertStatus(200);
+        $foo = $modules->getModule('foo');
+        $this->assertEquals('foo', $foo['routes.0.route']);
     }
 
     public function _test_route_collision_throws_exception()

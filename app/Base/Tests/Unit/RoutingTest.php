@@ -25,7 +25,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
         $foo = new Dot($foo);
-        $routes = new Routes($foo);
+        $routes = new Routes;
 
         $options = [
             [['uri' => ''], 'foo'],
@@ -45,7 +45,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
         $foo = new Dot($foo);
-        $routes = new Routes($foo);
+        $routes = new Routes;
 
         $options = [
             [['uri' => ''], 'get'],
@@ -65,7 +65,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
         $foo = new Dot($foo);
-        $routes = new Routes($foo);
+        $routes = new Routes;
 
         $options = [
             [['uri' => '', 'uses' => 'FooBarController@test'], 'App\\Foo\\Http\\Controllers\\FooBarController@test'],
@@ -78,14 +78,14 @@ class RoutingTest extends \Base\Tests\TestCase
         }
 
         $foo['routesController'] = 'FooBarController';
-        $routes = new Routes($foo);
+        $routes = new Routes;
         $route = $routes->routeConfig(['uri' => ''], $foo);
         $this->assertEquals('App\\Foo\\Http\\Controllers\\FooBarController@index', $route['uses']);
 
         $foo = $modules->moduleConfigDefault('foo');
         $foo = new Dot($foo);
         $foo['paths.controllers'] = '';
-        $routes = new Routes($foo);
+        $routes = new Routes;
 
         $route = $routes->routeConfig(['uri' => ''], $foo);
         $this->assertEquals('App\\Foo\\FooController@index', $route['uses']);
@@ -99,7 +99,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
         $foo = new Dot($foo);
-        $routes = new Routes($foo);
+        $routes = new Routes;
 
         $options = [
             [['uri' => ''], 'foo.index'],
@@ -123,7 +123,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
         $foo = new Dot($foo);
-        $routes = new Routes($foo);
+        $routes = new Routes;
         $route = $routes->routeConfig([
             'uri' => '',
             'method' => 'resource'
@@ -148,15 +148,14 @@ class RoutingTest extends \Base\Tests\TestCase
     {
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
-        $config = new Dot([
-            'foo' => $foo
-        ]);
-        $config['foo.routes'] = [
+        $foo = new Dot($foo);
+        $foo['routes'] = [
             [
                 'uri' => '',
                 'method' => 'resource'
             ]
         ];
+        $config = ['foo' => $foo];
         $routes = new Routes($config);
         $routes->loadRoutes();
 
@@ -171,6 +170,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $this->expectException(InvalidRouteException::class);
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
+        $foo = new Dot($foo);
         $foo['routes'] = [
             [
                 'uri' => '',
@@ -178,9 +178,7 @@ class RoutingTest extends \Base\Tests\TestCase
                 'uses' => 'FooBarController@test'
             ]
         ];
-        $config = new Dot([
-            'foo' => $foo
-        ]);
+        $config = ['foo' => $foo];
         $routes = new Routes($config);
         $routes->loadRoutes();
     }
@@ -190,14 +188,13 @@ class RoutingTest extends \Base\Tests\TestCase
         $this->expectException(InvalidRouteException::class);
         $modules = new Modules;
         $foo = $modules->moduleConfigDefault('foo');
+        $foo = new Dot($foo);
         $foo['routes'] = [
             [
                 'name' => 'foo'
             ]
         ];
-        $config = new Dot([
-            'foo' => $foo
-        ]);
+        $config = ['foo' => $foo];
         $routes = new Routes($config);
         $routes->loadRoutes();
     }
