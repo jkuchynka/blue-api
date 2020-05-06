@@ -1,0 +1,29 @@
+name: Auth
+description: Handles authorization and JWT tokens
+version: 0.1
+dependsOn:
+  - users
+paths:
+  controllers:
+routes:
+  -
+    uri: login
+    method: post
+  -
+    uri: logout
+  -
+    uri: register
+    method: post
+  -
+    uri: request-reset
+    method: post
+  -
+    uri: reset
+    method: post
+  -
+    uri: validate-verify
+    method: post
+  -
+    uri: verify
+    method: post
+

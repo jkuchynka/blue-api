@@ -61,7 +61,9 @@ class Kernel extends ConsoleKernel
         foreach ($moduleConfigs as $module) {
             $path = $module['paths.module'] . '/Console/Commands';
             if (is_dir($path)) {
-                $namespace ='';// $module['namespace'];
+                // @todo: Make sure this works with any module namespace and path
+                // $namespace = $module['namespace'];
+                $namespace = '';
                 foreach ((new Finder)->in($path)->files() as $command) {
                     $command = $namespace.str_replace(
                         ['/', '.php'],

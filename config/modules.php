@@ -14,6 +14,7 @@ return [
     // Enabled modules, can override settings here
     'modules' => [
         'base' => [],
+        'messages' => [],
         'users' => []
     ]
 

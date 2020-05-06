@@ -16,5 +16,3 @@ routes:
     method: resource
     model: User
     controller: UsersController
-  -
-    uri: 'testing/{user}'

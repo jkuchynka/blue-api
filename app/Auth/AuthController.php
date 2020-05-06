@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -10,6 +10,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Spatie\UrlSigner\MD5UrlSigner;
 use JWTAuth;
 use Auth;
+use Base\Http\Controller;
 use App\Users\User;
 use App\Mail\Auth\Verify;
 
