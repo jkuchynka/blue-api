@@ -11,24 +11,17 @@ use Base\Services\Modules;
 
 class ModulesTest extends \Base\Tests\TestCase
 {
+    protected $loadModules = ['base'];
+
     public function test_get_enabled_modules()
     {
-        $repo = new Repository([
-            'modules' => [
-                'modules' => [
-                    'foo' => [],
-                    'bar' => [],
-                    'baz' => []
-                ]
-            ]
-        ]);
-        $modules = new Modules($repo);
+        $modules = new Modules;
         $enabled = $modules->getEnabledModules();
-        $this->assertEquals(['foo', 'bar', 'baz'], $enabled);
+        $this->assertEquals(['base'], $enabled);
         $modules->loadModules($enabled);
         $config = $modules->getModules();
         $this->assertIsArray($config);
-        $this->assertInstanceOf(Dot::class, $config['foo']);
+        $this->assertInstanceOf(Dot::class, $config['base']);
     }
 
     public function test_get_module_config_default()
@@ -80,7 +73,7 @@ class ModulesTest extends \Base\Tests\TestCase
             ]
         ]);
         $modules = new Modules($repo);
-        $modules->loadModules($modules->getEnabledModules());
+        $modules->loadModules(['foo', 'bar', 'baz']);
         $config = $modules->getModules();
 
         $this->assertEquals('foo', $config['foo']['key']);
@@ -111,7 +104,7 @@ paths:
                 ')
             ->at($root);
         $modules = new Modules($repo);
-        $modules->loadModules($modules->getEnabledModules());
+        $modules->loadModules(['foo']);
         $foo = $modules->getModule('foo');
         $this->assertEquals('123', $foo['version']);
         $this->assertEquals('foobar', $foo['description']);
@@ -144,7 +137,7 @@ paths:
                 ')
             ->at($root);
         $modules = new Modules($repo);
-        $modules->loadModules($modules->getEnabledModules());
+        $modules->loadModules(['foo']);
         $foo = $modules->getModule('foo');
         $this->assertEquals('123.123', $foo['version']);
         $this->assertEquals('Database', $foo['paths.migrations']);
@@ -175,7 +168,7 @@ routes:
         ]);
 
         $modules = new Modules($repo);
-        $modules->loadModules($modules->getEnabledModules());
+        $modules->loadModules(['foo']);
 
         $foo = $modules->getModule('foo');
         $this->assertEquals('foo', $foo['routes.0.route']);

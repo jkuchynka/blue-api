@@ -13,7 +13,7 @@ class Modules
     protected $configRepository;
     protected $yaml;
 
-    protected static $modules = [];
+    protected static $enabledModules = [];
 
     public function __construct(Repository $config = null, Yaml $yaml = null)
     {
@@ -29,16 +29,21 @@ class Modules
      */
     public function getEnabledModules(): array
     {
-        if ( ! empty(static::$modules)) {
-            return static::$modules;
+        if ( ! empty(static::$enabledModules)) {
+            return static::$enabledModules;
         }
         $enabled = $this->configRepository->get('modules.modules', []);
         return array_keys($enabled);
     }
 
-    public static function setEnabledModules($modules)
+    /**
+     * Explicitly set the modules to enable (used for testing)
+     *
+     * @param array $modules Module keys
+     */
+    public static function setEnabledModules(array $modules): void
     {
-        static::$modules = $modules;
+        static::$enabledModules = $modules;
     }
 
     /**
@@ -87,7 +92,7 @@ class Modules
 
             // If this module depends on other modules,
             // make sure they are loaded as well
-            $keys = array_diff($config['dependsOn'], $modules);
+            $keys = array_diff($config['dependsOn'], $modules, array_keys($this->config));
             if ($keys) {
                 $this->loadModules($keys);
             }

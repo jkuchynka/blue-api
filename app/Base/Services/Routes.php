@@ -87,10 +87,8 @@ class Routes
 
         // Setup name
         $names = [$module['key']];
-        if (isset($route['name'])) {
-            if ( ! empty($route['name'])) {
-                $names[] = $route['name'];
-            }
+        if ( ! empty($route['name'])) {
+            $names[] = $route['name'];
         } else {
             $tempUri = explode('/', $route['uri']);
             while ($temp = array_shift($tempUri)) {
@@ -99,34 +97,34 @@ class Routes
                     $names[] = Str::camel($temp);
                 }
             }
-            if ($method != 'resource') {
-                $names[] = $action;
-            }
         }
         $name = implode('.', $names);
 
         // Setup controller
-        if (isset($route['uses'])) {
+        $uses = empty($route['uses']) ? null : $route['uses'];
+        if ($uses) {
             // Does uses specify controller?
-            if (Str::contains($route['uses'], 'Controller')) {
-                $controller = $route['uses'];
-            } else {
-                // Uses is the action
-                $controller = $module['routesController'];
-                $action = $route['uses'];
+            if ( ! Str::contains($uses, 'Controller')) {
+                // Uses is the controller function
+                $uses = $module['routesController'] . '@' . $uses;
             }
         } else {
-            $controller = $module['routesController'];
+            $uses = $module['routesController'];
+        }
+        // Does uses specify function?
+        if ($method != 'resource' && ! Str::contains($uses, '@')) {
+            $uses .= '@';
+            if (empty($route['uri'])) {
+                $uses .= $module['key'];
+            } else {
+                $function = Str::of($route['uri'])
+                    ->replace('/', '_')
+                    ->camel();
+                $uses .= $function;
+            }
         }
 
-        // Is an action defined?
-        if ($method != 'resource' && $action && ! Str::contains($controller, '@')) {
-            $uses = $controller . '@' . $action;
-        } else {
-            $uses = $controller;
-        }
-
-        // Add namespace to uses if full namespace not
+        // Add namespace to uses controller if full namespace not
         // already defined
         if ( ! Str::contains($uses, '\\')) {
             $namespace = ! empty($route['namespace']) ? $route['namespace'] : $module['paths.controllers'] ? $module['namespace'] . '\\' . $module['paths.controllers'] : $module['namespace'];

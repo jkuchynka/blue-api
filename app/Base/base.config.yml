@@ -5,8 +5,6 @@ paths:
   migrations: Database
 routes:
   # API base route GET /
-  # Absolute route won't be prefixed
   -
     uri: /
-    name: .baseApi
     uses: baseApi

@@ -28,8 +28,9 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
-        // Ensure loaded modules before app is setup
-        if ($this->loadModules) {
+        // Only load specific modules before app is setup,
+        // otherwise tests will use normal app config
+        if ( ! empty($this->loadModules)) {
             Modules::setEnabledModules($this->loadModules);
         }
         parent::setUp();

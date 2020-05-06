@@ -11,6 +11,8 @@ use Base\Services\Routes;
 
 class RoutingTest extends \Base\Tests\TestCase
 {
+    protected $loadModules = ['base'];
+
     protected function setUp(): void
     {
         // Disable loading module routes
@@ -70,6 +72,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $options = [
             [['uri' => '', 'uses' => 'FooBarController@test'], 'App\\Foo\\Http\\Controllers\\FooBarController@test'],
             [['uri' => '', 'uses' => 'test'], 'App\\Foo\\Http\\Controllers\\FooController@test'],
+            [['uri' => 'foo/bar'], 'App\\Foo\\Http\\Controllers\\FooController@fooBar']
         ];
 
         foreach ($options as $option) {
@@ -80,7 +83,7 @@ class RoutingTest extends \Base\Tests\TestCase
         $foo['routesController'] = 'FooBarController';
         $routes = new Routes;
         $route = $routes->routeConfig(['uri' => ''], $foo);
-        $this->assertEquals('App\\Foo\\Http\\Controllers\\FooBarController@index', $route['uses']);
+        $this->assertEquals('App\\Foo\\Http\\Controllers\\FooBarController@foo', $route['uses']);
 
         $foo = $modules->moduleConfigDefault('foo');
         $foo = new Dot($foo);
@@ -88,10 +91,10 @@ class RoutingTest extends \Base\Tests\TestCase
         $routes = new Routes;
 
         $route = $routes->routeConfig(['uri' => ''], $foo);
-        $this->assertEquals('App\\Foo\\FooController@index', $route['uses']);
+        $this->assertEquals('App\\Foo\\FooController@foo', $route['uses']);
 
         $route = $routes->routeConfig(['uri' => '', 'uses' => 'App\\Bar\\BarController'], $foo);
-        $this->assertEquals('App\\Bar\\BarController@index', $route['uses']);
+        $this->assertEquals('App\\Bar\\BarController@foo', $route['uses']);
     }
 
     public function test_routes_config_route_sets_name()
@@ -102,14 +105,14 @@ class RoutingTest extends \Base\Tests\TestCase
         $routes = new Routes;
 
         $options = [
-            [['uri' => ''], 'foo.index'],
-            [['uri' => '{foo}'], 'foo.show'],
-            [['uri' => '', 'method' => 'post'], 'foo.store'],
-            [['uri' => '{foo}', 'method' => 'put'], 'foo.update'],
-            [['uri' => '{foo}', 'method' => 'delete'], 'foo.destroy'],
-            [['uri' => '', 'method' => 'delete'], 'foo.destroyMany'],
+            [['uri' => ''], 'foo'],
+            [['uri' => '{foo}'], 'foo'],
+            [['uri' => '', 'method' => 'post'], 'foo'],
+            [['uri' => '{foo}', 'method' => 'put'], 'foo'],
+            [['uri' => '{foo}', 'method' => 'delete'], 'foo'],
+            [['uri' => '', 'method' => 'delete'], 'foo'],
             [['uri' => '', 'name' => 'foobar'], 'foo.foobar'],
-            [['uri' => 'bar'], 'foo.bar.index'],
+            [['uri' => 'bar'], 'foo.bar'],
             [['uri' => 'bar', 'method' => 'resource'], 'foo.bar']
         ];
 
