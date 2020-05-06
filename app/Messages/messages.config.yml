@@ -1,0 +1,13 @@
+name: Messages
+description: Messaging, contact messages
+version: 0.1
+paths:
+  migrations: Database/M
+  factories: Database
+  seeds: Database
+  controllers:
+routes:
+  -
+    uri: contacts
+    method: resource
+    uses: ContactMessagesController

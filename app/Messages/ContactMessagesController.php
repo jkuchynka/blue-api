@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Messages;
 
 use Illuminate\Http\Request;
-use App\ContactMessage;
+use App\Messages\ContactMessage;
+use Base\Http\Controller;
 
 class ContactMessagesController extends Controller
 {
