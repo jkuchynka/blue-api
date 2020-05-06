@@ -4,8 +4,10 @@ namespace Base\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Config\Repository;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Symfony\Component\Yaml\Yaml;
 use Base\Services\Modules;
+use Base\Database\SeedCommand;
 
 class ModuleServiceProvider extends ServiceProvider
 {
@@ -16,12 +18,16 @@ class ModuleServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Modules::class, function ($app) {
+        $this->app->singleton('modules', function ($app) {
             $config = $app->make(Repository::class);
             $yaml = $app->make(Yaml::class);
             $modules = new Modules($config, $yaml);
             $modules->loadModules();
             return $modules;
+        });
+
+        $this->app->singleton('command.seed', function ($app) {
+            return new SeedCommand($app['db']);
         });
     }
 
@@ -32,6 +38,16 @@ class ModuleServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $modules = $this->app->make('modules');
+        $factory = $this->app->make(EloquentFactory::class);
+        $migrator = $this->app->make('migrator');
+        $modulesConfig = $modules->getModules();
+        foreach ($modulesConfig as $module) {
+            // Load factories from modules
+            $factory->load($module['paths.module'] . '/' . $module['paths.factories']);
+
+            // Register module migration paths
+            $migrator->path($module['paths.module'] . '/' . $module['paths.migrations']);
+        }
     }
 }

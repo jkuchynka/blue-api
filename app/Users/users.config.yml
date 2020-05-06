@@ -1,0 +1,18 @@
+name: Users
+description: Users module
+version: 0.1
+seeds: true
+seedsWeight: 0
+paths:
+  controllers:
+  factories: Database
+  migrations: Database
+  seeds: Database
+routes:
+  -
+    uri: /users
+    method: resource
+    model: User
+    controller: UsersController
+  -
+    uri: 'testing/{user}'

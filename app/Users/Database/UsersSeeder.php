@@ -1,10 +1,12 @@
 <?php
 
+namespace App\Users\Database;
+
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use App\User;
+use App\Users\User;
 
-class UserSeeder extends Seeder
+class UsersSeeder extends Seeder
 {
     /**
      * Run the database seeds.

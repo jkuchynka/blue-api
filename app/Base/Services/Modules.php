@@ -89,6 +89,8 @@ class Modules
             'key' => $key,
             'name' => Str::studly($key),
             'version' => '0.1',
+            'seeds' => false,
+            'seedsWeight' => 10,
             'paths' => [
                 'migrations' => 'Database/Migrations',
                 'factories' => 'Database/Factories',
