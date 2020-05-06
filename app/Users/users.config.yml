@@ -1,6 +1,8 @@
 name: Users
 description: Users module
 version: 0.1
+dependsOn:
+  - auth
 seeds: true
 seedsWeight: 0
 paths:

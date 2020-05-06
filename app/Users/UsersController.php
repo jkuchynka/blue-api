@@ -4,10 +4,12 @@ namespace App\Users;
 
 use App\Users\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Base\Http\Filters\FiltersAll;
-use App\Auth\Verify;
+use App\Auth\Mail\Verify;
 
 class UsersController extends \Base\Http\Controller
 {
@@ -51,7 +53,7 @@ class UsersController extends \Base\Http\Controller
         $record->save();
 
         Mail::to([
-                ['email' => $record->email, 'name' => $record->name]
+            ['email' => $record->email, 'name' => $record->name]
         ])->send(new Verify($record));
         return response()->json($record);
     }

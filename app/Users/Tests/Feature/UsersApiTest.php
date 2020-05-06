@@ -11,6 +11,8 @@ class UsersApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $loadModules = ['users'];
+
     protected $users = [];
 
     protected function beforeTest()
@@ -29,7 +31,7 @@ class UsersApiTest extends TestCase
         ]);
     }
 
-    public function testGetUsersReturnsAll()
+    public function test_users_index_returns_all()
     {
         $response = $this->json('GET', '/api/users')
             ->assertStatus(200)
@@ -39,7 +41,7 @@ class UsersApiTest extends TestCase
             ->assertJsonPath('data.2.email', $this->users[2]->email);
     }
 
-    public function testGetUsersFilterField()
+    public function test_users_index_filters_fields()
     {
         $response = $this->json('GET', '/api/users?filter[name]=donald');
         $response
@@ -54,7 +56,7 @@ class UsersApiTest extends TestCase
             ->assertJsonPath('total', 0);
     }
 
-    public function testGetUsersSearchFields()
+    public function test_users_index_searches_fields()
     {
         $response = $this->json('GET', '/api/users?filter[all]=duck');
         $response
@@ -66,7 +68,7 @@ class UsersApiTest extends TestCase
             ->assertJsonPath('total', 1);
     }
 
-    public function testGetUsersSorts()
+    public function test_users_index_sorts()
     {
         $response = $this->json('GET', '/api/users?sort=email');
         $response
@@ -78,5 +80,39 @@ class UsersApiTest extends TestCase
             ->assertJsonPath('data.0.name', 'duey')
             ->assertJsonPath('data.1.name', 'scrooge')
             ->assertJsonPath('data.2.name', 'donald');
+    }
+
+    public function test_users_index_paginates()
+    {
+        $response = $this->json('get', route('users.index'), [
+            'page' => [
+                'size' => 2
+            ]
+        ]);
+        $this->assertCount(2, $response->json('data'));
+        $response->assertJsonPath('total', 3);
+    }
+
+    public function test_users_stores_new_user()
+    {
+        $response = $this->json('post', route('users.store'), [
+            'name' => 'foo',
+            'email' => 'bar@mail.net'
+        ]);
+        $response
+            ->assertStatus(200)
+            ->assertJsonPath('name', 'foo');
+    }
+
+    public function test_users_updates_user()
+    {
+        $response = $this->json('put', route('users.update', ['user' => $this->users[0]]), [
+            'params' => [
+                'name' => 'foobar'
+            ]
+        ]);
+        $response
+            ->assertStatus(200)
+            ->assertJsonPath('name', 'foobar');
     }
 }
