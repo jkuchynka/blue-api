@@ -74,6 +74,13 @@ class Modules
 
             $config->mergeRecursiveDistinct($appConfig);
             $this->config[$key] = $config;
+
+            // If this module depends on other modules,
+            // make sure they are loaded as well
+            $keys = array_diff($config['dependsOn'], $modules);
+            if ($keys) {
+                $this->loadModules($keys);
+            }
         }
     }
 
@@ -89,6 +96,7 @@ class Modules
             'key' => $key,
             'name' => Str::studly($key),
             'version' => '0.1',
+            'dependsOn' => [],
             'seeds' => false,
             'seedsWeight' => 10,
             'paths' => [

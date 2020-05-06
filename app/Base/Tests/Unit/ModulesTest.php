@@ -181,6 +181,23 @@ routes:
         $this->assertEquals('foo', $foo['routes.0.route']);
     }
 
+    public function test_load_module_dependencies()
+    {
+        $repo = new Repository([
+            'modules' => [
+                'modules' => [
+                    'foo' => [
+                        'dependsOn' => ['bar']
+                    ]
+                ]
+            ]
+        ]);
+        $modules = new Modules($repo);
+        $modules->loadModules(['foo']);
+        $config = $modules->getModules();
+        $this->assertInstanceOf(Dot::class, $config['bar']);
+    }
+
     public function _test_route_collision_throws_exception()
     {
 
