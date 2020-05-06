@@ -36,6 +36,12 @@ class Routes
                     if ($method == 'resource') {
                         Route::apiResource($config['uri'], $config['uses'], [
                             'as' => $config['name']
+                        ])->names([
+                            'index' => $config['name'] . '.index',
+                            'store' => $config['name'] . '.store',
+                            'show' => $config['name'] . '.show',
+                            'update' => $config['name'] . '.update',
+                            'destroy' => $config['name'] . '.destroy'
                         ]);
                     } else {
                         Route::$method($config['uri'], [
@@ -80,11 +86,7 @@ class Routes
         }
 
         // Setup name
-        if ($method == 'resource') {
-            $names = [];
-        } else {
-            $names = [$module['key']];
-        }
+        $names = [$module['key']];
         if (isset($route['name'])) {
             if ( ! empty($route['name'])) {
                 $names[] = $route['name'];

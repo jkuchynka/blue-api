@@ -16,8 +16,6 @@ class RouteServiceProvider extends ServiceProvider
 {
     use ForwardsCalls;
 
-    protected $modules;
-
     /**
      * The controller namespace for the application.
      *
@@ -37,10 +35,8 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(Modules $modules)
+    public function boot()
     {
-        $this->modules = $modules;
-
         $this->setRootControllerNamespace();
 
         if ( ! static::$loadRoutes) {
@@ -105,8 +101,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function loadRoutes()
     {
-        $modules = $this->modules->getModules();
-        $routes = new Routes($modules);
+        $modules = $this->app['modules'];
+        $modulesConfig = $modules->getModules();
+        $routes = new Routes($modulesConfig);
         $routes->loadRoutes();
     }
 

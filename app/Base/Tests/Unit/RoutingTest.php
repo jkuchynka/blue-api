@@ -109,7 +109,8 @@ class RoutingTest extends \Base\Tests\TestCase
             [['uri' => '{foo}', 'method' => 'delete'], 'foo.destroy'],
             [['uri' => '', 'method' => 'delete'], 'foo.destroyMany'],
             [['uri' => '', 'name' => 'foobar'], 'foo.foobar'],
-            [['uri' => 'bar'], 'foo.bar.index']
+            [['uri' => 'bar'], 'foo.bar.index'],
+            [['uri' => 'bar', 'method' => 'resource'], 'foo.bar']
         ];
 
         foreach ($options as $option) {
@@ -130,7 +131,7 @@ class RoutingTest extends \Base\Tests\TestCase
         ], $foo);
 
         $this->assertEquals('resource', $route['method']);
-        $this->assertEquals('', $route['name']);
+        $this->assertEquals('foo', $route['name']);
         $this->assertEquals('App\\Foo\\Http\\Controllers\\FooController', $route['uses']);
 
         $route = $routes->routeConfig([
@@ -140,7 +141,7 @@ class RoutingTest extends \Base\Tests\TestCase
         ], $foo);
 
         $this->assertEquals('resource', $route['method']);
-        $this->assertEquals('', $route['name']);
+        $this->assertEquals('foo', $route['name']);
         $this->assertEquals('App\\Foo\\Http\\Controllers\\FooBarController', $route['uses']);
     }
 

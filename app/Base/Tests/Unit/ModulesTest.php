@@ -23,8 +23,9 @@ class ModulesTest extends \Base\Tests\TestCase
             ]
         ]);
         $modules = new Modules($repo);
-        $this->assertEquals(['foo', 'bar', 'baz'], $modules->getEnabledModules());
-        $modules->loadModules();
+        $enabled = $modules->getEnabledModules();
+        $this->assertEquals(['foo', 'bar', 'baz'], $enabled);
+        $modules->loadModules($enabled);
         $config = $modules->getModules();
         $this->assertIsArray($config);
         $this->assertInstanceOf(Dot::class, $config['foo']);
@@ -79,7 +80,7 @@ class ModulesTest extends \Base\Tests\TestCase
             ]
         ]);
         $modules = new Modules($repo);
-        $modules->loadModules();
+        $modules->loadModules($modules->getEnabledModules());
         $config = $modules->getModules();
 
         $this->assertEquals('foo', $config['foo']['key']);
@@ -110,7 +111,7 @@ paths:
                 ')
             ->at($root);
         $modules = new Modules($repo);
-        $modules->loadModules();
+        $modules->loadModules($modules->getEnabledModules());
         $foo = $modules->getModule('foo');
         $this->assertEquals('123', $foo['version']);
         $this->assertEquals('foobar', $foo['description']);
@@ -143,7 +144,7 @@ paths:
                 ')
             ->at($root);
         $modules = new Modules($repo);
-        $modules->loadModules();
+        $modules->loadModules($modules->getEnabledModules());
         $foo = $modules->getModule('foo');
         $this->assertEquals('123.123', $foo['version']);
         $this->assertEquals('Database', $foo['paths.migrations']);
@@ -174,7 +175,7 @@ routes:
         ]);
 
         $modules = new Modules($repo);
-        $modules->loadModules();
+        $modules->loadModules($modules->getEnabledModules());
 
         $foo = $modules->getModule('foo');
         $this->assertEquals('foo', $foo['routes.0.route']);

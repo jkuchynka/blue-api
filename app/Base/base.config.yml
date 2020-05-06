@@ -1,0 +1,12 @@
+name: Base
+description: Base module for the Blue API
+version: 0.1
+paths:
+  migrations: Database
+routes:
+  # API base route GET /
+  # Absolute route won't be prefixed
+  -
+    uri: /
+    name: .baseApi
+    uses: baseApi

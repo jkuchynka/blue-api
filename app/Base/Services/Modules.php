@@ -50,10 +50,10 @@ class Modules
      *
      * @return void
      */
-    public function loadModules(): void
+    public function loadModules(array $modules): void
     {
         // Setup each module's config from default, yaml and app level
-        foreach ($this->getEnabledModules() as $key) {
+        foreach ($modules as $key) {
             $config = new Dot($this->moduleConfigDefault($key));
 
             // Check config/modules settings for app level settings
