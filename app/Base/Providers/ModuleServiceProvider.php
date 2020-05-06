@@ -24,6 +24,7 @@ class ModuleServiceProvider extends ServiceProvider
             $yaml = $app->make(Yaml::class);
             $modules = new Modules($config, $yaml);
             $modules->loadModules($modules->getEnabledModules());
+
             return $modules;
         });
 

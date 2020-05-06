@@ -13,6 +13,8 @@ class Modules
     protected $configRepository;
     protected $yaml;
 
+    protected static $modules = [];
+
     public function __construct(Repository $config = null, Yaml $yaml = null)
     {
         $this->configRepository = $config ? $config : new Repository;
@@ -27,8 +29,16 @@ class Modules
      */
     public function getEnabledModules(): array
     {
+        if ( ! empty(static::$modules)) {
+            return static::$modules;
+        }
         $enabled = $this->configRepository->get('modules.modules', []);
         return array_keys($enabled);
+    }
+
+    public static function setEnabledModules($modules)
+    {
+        static::$modules = $modules;
     }
 
     /**

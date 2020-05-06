@@ -2,11 +2,16 @@
 
 namespace Base\Tests;
 
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Base\Services\Modules;
+use Base\Providers\ModuleServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
+
+    protected $loadModules = [];
 
     /**
      * Runs before each test
@@ -23,8 +28,13 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
+        // Ensure loaded modules before app is setup
+        if ($this->loadModules) {
+            Modules::setEnabledModules($this->loadModules);
+        }
         parent::setUp();
         $this->beforeTest();
+
     }
 
     /**
