@@ -1,8 +1,9 @@
 name: Messages
 description: Messaging, contact messages
 version: 0.1
+seeds: true
 paths:
-  migrations: Database/M
+  migrations: Database
   factories: Database
   seeds: Database
   controllers:

@@ -3,11 +3,61 @@
 namespace App\Messages;
 
 use Illuminate\Http\Request;
-use App\Messages\ContactMessage;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+use Base\Http\Filters\FiltersAll;
 use Base\Http\Controller;
+use App\Messages\ContactMessage;
 
 class ContactMessagesController extends Controller
 {
+    /**
+     * Get validation rules
+     *
+     * @param  bool $update For use in update method
+     * @return array
+     */
+    public function rules(bool $update = false)
+    {
+        return [
+            'email' => 'required|email',
+            'name' => 'required',
+            'subject' => 'required',
+            'message' => 'required'
+        ];
+    }
+
+    /**
+     * Get allowed filters for index query
+     *
+     * @return array
+     */
+    public function filters()
+    {
+        return [
+            'id',
+            'email',
+            'name',
+            'subject',
+            'message'
+        ];
+    }
+
+    /**
+     * Get allowed sorts for index query
+     *
+     * @return array
+     */
+    public function sorts()
+    {
+        return [
+            'id',
+            'email',
+            'name',
+            'subject'
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +65,13 @@ class ContactMessagesController extends Controller
      */
     public function index()
     {
-        //
+        $filters = $this->filters();
+        $filters[] = AllowedFilter::custom('all', new FiltersAll($this->filters()));
+        $results = QueryBuilder::for(ContactMessage::class)
+            ->allowedFilters($filters)
+            ->allowedSorts($this->sorts())
+            ->jsonPaginate();
+        return $results;
     }
 
     /**
@@ -26,21 +82,14 @@ class ContactMessagesController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'name' => 'required',
-            'subject' => 'required',
-            'message' => 'required'
-        ]);
-        ContactMessage::create([
+        $request->validate($this->rules());
+        $record = ContactMessage::create([
             'email' => $request->email,
             'name' => $request->name,
             'subject' => $request->subject,
             'message' => $request->message
         ]);
-        return response()->json([
-            'message' => 'Successfully created contact message.'
-        ]);
+        return response()->json($record);
     }
 
     /**
@@ -51,19 +100,8 @@ class ContactMessagesController extends Controller
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+        $record = ContactMessage::findOrFail($id);
+        return response()->json($record);
     }
 
     /**

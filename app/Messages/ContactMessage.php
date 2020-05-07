@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Messages;
 
 use Illuminate\Database\Eloquent\Model;
 
