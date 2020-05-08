@@ -5,114 +5,189 @@ namespace App\Users\Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Base\Tests\TestCase;
+use Base\Tests\Traits\ProvidesController;
+use Base\Tests\Traits\ProvidesModel;
+use App\Users\UsersController;
 use App\Users\User;
 
+/**
+ * API feature resource test
+ */
 class UsersApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase,
+        ProvidesController,
+        ProvidesModel;
 
+    /**
+     * Ensure this test only loads these modules and their
+     * dependencies
+     *
+     * @type array
+     */
     protected $loadModules = ['users'];
 
-    protected $users = [];
-
-    protected function beforeTest()
+    /**
+     * Return the fields that should be in responses
+     *
+     * @return array
+     */
+    protected function responseFields()
     {
-        $this->users[] = factory(User::class)->create([
-            'name' => 'donald',
-            'email' => 'donald.duck@mail.net'
-        ]);
-        $this->users[] = factory(User::class)->create([
-            'name' => 'duey',
-            'email' => 'quack@gmail.com'
-        ]);
-        $this->users[] = factory(User::class)->create([
-            'name' => 'scrooge',
-            'email' => 'moneybags@example.org'
-        ]);
+        return [
+            'id',
+            'name',
+            'email',
+            'created_at',
+            'updated_at'
+        ];
     }
 
-    public function test_users_index_returns_all()
+    /**
+     * Return the controller under test
+     *
+     * @return string|Base\Http\Controller
+     */
+    protected function controller()
     {
-        $response = $this->json('GET', '/api/users')
-            ->assertStatus(200)
-            // Records should be in data
-            ->assertJsonPath('data.0.id', $this->users[0]->id)
-            ->assertJsonPath('data.1.name', $this->users[1]->name)
-            ->assertJsonPath('data.2.email', $this->users[2]->email);
+        return UsersController::class;
     }
 
-    public function test_users_index_filters_fields()
+    /**
+     * Return the model under test
+     *
+     * @return Model
+     */
+    protected function model()
     {
-        $response = $this->json('GET', '/api/users?filter[name]=donald');
-        $response
-            ->assertJsonPath('data.0.name', 'donald')
-            ->assertJsonPath('total', 1);
-        $response = $this->json('GET', '/api/users?filter[email]=quack');
-        $response
-            ->assertJsonPath('data.0.name', 'duey')
-            ->assertJsonPath('total', 1);
-        $response = $this->json('GET', '/api/users?filter[name]=foobar')
-            ->assertJsonPath('data', [])
-            ->assertJsonPath('total', 0);
+        return User::class;
     }
 
-    public function test_users_index_searches_fields()
+    /**
+     * Test the basic index api
+     */
+    public function test_index()
     {
-        $response = $this->json('GET', '/api/users?filter[all]=duck');
-        $response
-            ->assertJsonPath('data.0.name', 'donald')
-            ->assertJsonPath('total', 1);
-        $response = $this->json('GET', '/api/users?filter[all]=roo');
-        $response
-            ->assertJsonPath('data.0.name', 'scrooge')
-            ->assertJsonPath('total', 1);
+        $route = 'users.index';
+
+        $this->assertApiIndex($route, $this->getModel(), $this->responseFields());
     }
 
-    public function test_users_index_sorts()
+    /**
+     * Test that the index api filters correct fields
+     */
+    public function test_index_filters_fields()
     {
-        $response = $this->json('GET', '/api/users?sort=email');
-        $response
-            ->assertJsonPath('data.0.name', 'donald')
-            ->assertJsonPath('data.1.name', 'scrooge')
-            ->assertJsonPath('data.2.name', 'duey');
-        $response = $this->json('GET', '/api/users?sort=-email');
-        $response
-            ->assertJsonPath('data.0.name', 'duey')
-            ->assertJsonPath('data.1.name', 'scrooge')
-            ->assertJsonPath('data.2.name', 'donald');
+        $route = 'users.index';
+
+        $this->assertApiIndexFilters($route, $this->getModel(), $this->getController());
     }
 
-    public function test_users_index_paginates()
+    /**
+     * Test that the index api searches across fields
+     */
+    public function test_index_searches_fields()
     {
-        $response = $this->json('get', route('users.index'), [
-            'page' => [
-                'size' => 2
-            ]
-        ]);
-        $this->assertCount(2, $response->json('data'));
-        $response->assertJsonPath('total', 3);
+        $route = 'users.index';
+
+        $this->assertApiIndexSearches($route, $this->getModel(), $this->getController());
     }
 
-    public function test_users_stores_new_user()
+    /**
+     * Test that the index api sorts fields
+     */
+    public function test_index_sorts_by_fields()
     {
-        $response = $this->json('post', route('users.store'), [
-            'name' => 'foo',
-            'email' => 'bar@mail.net'
-        ]);
-        $response
-            ->assertStatus(200)
-            ->assertJsonPath('name', 'foo');
+        $route = 'users.index';
+
+        $this->assertApiIndexSorts($route, $this->getModel(), $this->getController());
     }
 
-    public function test_users_updates_user()
+    /**
+     * Test that the index api paginates fields
+     */
+    public function test_index_paginates_fields()
     {
-        $response = $this->json('put', route('users.update', ['user' => $this->users[0]]), [
-            'params' => [
-                'name' => 'foobar'
-            ]
-        ]);
-        $response
-            ->assertStatus(200)
-            ->assertJsonPath('name', 'foobar');
+        $route = 'users.index';
+
+        $this->assertApiIndexPaginates($route, $this->getModel(), $this->getController());
+    }
+
+    /**
+     * Test that the store api returns a validation
+     * errors response with an invalid field.
+     */
+    public function test_store_validates()
+    {
+        $route = 'users.store';
+        $invalidField = 'email';
+
+        $this->assertApiStoreValidates($route, $invalidField, $this->getModel());
+    }
+
+    /**
+     * Test that the store api successfully creates record.
+     */
+    public function test_store_success()
+    {
+        $route = 'users.store';
+
+        $this->assertApiStoreSuccess($route, $this->getModel(), $this->responseFields());
+    }
+
+    /**
+     * Test that the show api successfully returns record.
+     */
+    public function test_show()
+    {
+        $route = 'users.show';
+
+        $this->assertApiShow($route, $this->getModel(), $this->responseFields());
+    }
+
+    /**
+     * Test that the show api returns 404 if record not found.
+     */
+    public function test_show_returns_404()
+    {
+        $route = 'users.show';
+
+        $this->assertApiShow404($route, $this->getModel());
+    }
+
+    /**
+     * Test that the update api returns a validation
+     * errors response with an invalid field.
+     */
+    public function test_update_validates()
+    {
+        $route = 'users.update';
+        $field = 'name';
+        $value = '';
+
+        $this->assertApiUpdateValidates($route, $this->getModel(), $field, $value);
+    }
+
+    /**
+     * Test that the update api successfully updates record.
+     */
+    public function test_update_success()
+    {
+        $route = 'users.update';
+        $field = 'email';
+        $value = 'foobar@mail.net';
+
+        $this->assertApiUpdateSuccess($route, $this->getModel(), $field, $value);
+    }
+
+    /**
+     * Test that the destroy api successfully deletes record.
+     */
+    public function test_delete_success()
+    {
+        $route = 'users.destroy';
+        $softDeletes = true;
+
+        $this->assertApiDestroySuccess($route, $this->getModel(), $softDeletes);
     }
 }

@@ -14,20 +14,59 @@ use App\Auth\Mail\Verify;
 class UsersController extends \Base\Http\Controller
 {
     /**
+     * Get validation rules
+     *
+     * @param  bool $update For use in update method
+     * @return array
+     */
+    public function rules(bool $update = false)
+    {
+        return [
+            'email' => 'required|email',
+            'name' => 'required'
+        ];
+    }
+
+    /**
+     * Get allowed filters for index query
+     *
+     * @return array
+     */
+    public function filters()
+    {
+        return [
+            'id',
+            'name',
+            'email'
+        ];
+    }
+
+    /**
+     * Get allowed sorts for index query
+     *
+     * @return array
+     */
+    public function sorts()
+    {
+        return [
+            'id',
+            'name',
+            'email'
+        ];
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
+        $filters = $this->filters();
+        $filters[] = AllowedFilter::custom('all', new FiltersAll($this->filters()));
         $results = QueryBuilder::for(User::class)
-            ->allowedFilters([
-                'name', 'email',
-                AllowedFilter::custom('all', new FiltersAll(['name', 'email']))
-            ])
-            ->allowedSorts([
-                'id', 'name', 'email'
-            ])
+            ->allowedFilters($filters)
+            ->allowedSorts($this->sorts())
             ->jsonPaginate();
         return $results;
     }
@@ -41,10 +80,7 @@ class UsersController extends \Base\Http\Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users'
-        ]);
+        $request->validate($this->rules());
         $record = new User;
         $record->fill($request->all());
 
@@ -79,8 +115,9 @@ class UsersController extends \Base\Http\Controller
      */
     public function update(Request $request, User $user)
     {
+        $request->validate($this->rules(true));
         $record = $user;
-        $record->fill($request->all()['params']);
+        $record->fill($request->all());
         $record->save();
         return response()->json($record);
     }
