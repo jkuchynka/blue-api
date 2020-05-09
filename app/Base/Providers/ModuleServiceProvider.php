@@ -32,10 +32,6 @@ class ModuleServiceProvider extends ServiceProvider
         $this->app->singleton('command.seed', function ($app) {
             return new SeedCommand($app['db']);
         });
-
-        $this->app->singleton('command.console.make', function ($app) {
-            return new ConsoleMakeCommand($app['db']);
-        });
     }
 
     /**

@@ -2,9 +2,9 @@
 
 namespace Base\Database;
 
-use Illuminate\Database\Console\Seeds\SeedCommand as IllSeedCommand;
+use Illuminate\Database\Console\Seeds\SeedCommand as BaseCommand;
 
-class SeedCommand extends IllSeedCommand
+class SeedCommand extends BaseCommand
 {
     /**
      * Get the console command options. Change default seeder

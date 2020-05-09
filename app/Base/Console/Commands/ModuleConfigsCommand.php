@@ -5,7 +5,7 @@ namespace Base\Console\Commands;
 use Illuminate\Console\Command;
 use Symfony\Component\Yaml\Yaml;
 
-class ModuleConfigs extends Command
+class ModuleConfigsCommand extends Command
 {
     /**
      * The name and signature of the console command.

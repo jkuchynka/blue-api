@@ -59,7 +59,7 @@ class Kernel extends ConsoleKernel
         $moduleConfigs = $modules->getModules();
 
         foreach ($moduleConfigs as $module) {
-            $path = $module['paths.module'] . '/Console/Commands';
+            $path = $module['paths.module'] . '/' . $module['paths.commands'];
             if (is_dir($path)) {
                 // @todo: Make sure this works with any module namespace and path
                 // $namespace = $module['namespace'];

@@ -43,11 +43,7 @@
         "psr-4": {
             "App\\": "app/",
             "Base\\": "app/Base/"
-        },
-        "classmap": [
-            "database/seeds",
-            "database/factories"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

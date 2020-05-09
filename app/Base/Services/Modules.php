@@ -115,13 +115,13 @@ class Modules
             'seeds' => false,
             'seedsWeight' => 10,
             'paths' => [
-                'migrations' => 'Database/Migrations',
-                'factories' => 'Database/Factories',
-                'seeds' => 'Database/Seeds',
+                'commands' => 'Console/Commands',
                 'controllers' => 'Http/Controllers',
-                'console' => [
-                    'commands' => 'Console/Commands'
-                ]
+                'factories' => 'Database/Factories',
+                'migrations' => 'Database/Migrations',
+                'models' => 'Models',
+                'resources' => 'Http/Resources',
+                'seeds' => 'Database/Seeds',
             ],
             'routesPrefix' => $key,
             'routes' => []
