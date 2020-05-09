@@ -41,9 +41,32 @@ class ConsoleMakeCommand extends BaseConsoleMakeCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        $namespace = $this->module['namespace'];
+        $namespace = $rootNamespace;
         $namespace .= $this->module['paths.console.commands'] ? '\\' . str_replace('/', '\\', $this->module['paths.console.commands']) : '';
         return $namespace;
+    }
+
+    /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    protected function rootNamespace()
+    {
+        return $this->module['namespace'];
+    }
+
+    /**
+     * Get the destination class path.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getPath($name)
+    {
+        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
+
+        return $this->module['paths.module'] . '/' . str_replace('\\', '/', $name).'.php';
     }
 
     /**
