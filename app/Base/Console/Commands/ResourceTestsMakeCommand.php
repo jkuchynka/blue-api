@@ -228,45 +228,6 @@ class ResourceTestsMakeCommand extends Command
     }
 
     /**
-     * Get the destination class path.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function getPath($name)
-    {
-        dd($name);
-        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
-
-        return base_path('tests').str_replace('\\', '/', $name).'.php';
-    }
-
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        if ($this->option('unit')) {
-            return $rootNamespace.'\Unit';
-        } else {
-            return $rootNamespace.'\Feature';
-        }
-    }
-
-    /**
-     * Get the root namespace for the class.
-     *
-     * @return string
-     */
-    protected function rootNamespace()
-    {
-        return 'Tests';
-    }
-
-    /**
      * Get the desired class name.
      *
      * @return string

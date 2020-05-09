@@ -9,6 +9,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Base\Services\Modules;
 use Base\Database\SeedCommand;
+use Base\Console\Commands\ConsoleMakeCommand;
 
 class ModuleServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,10 @@ class ModuleServiceProvider extends ServiceProvider
 
         $this->app->singleton('command.seed', function ($app) {
             return new SeedCommand($app['db']);
+        });
+
+        $this->app->singleton('command.console.make', function ($app) {
+            return new ConsoleMakeCommand($app['db']);
         });
     }
 

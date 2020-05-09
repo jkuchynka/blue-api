@@ -118,7 +118,10 @@ class Modules
                 'migrations' => 'Database/Migrations',
                 'factories' => 'Database/Factories',
                 'seeds' => 'Database/Seeds',
-                'controllers' => 'Http/Controllers'
+                'controllers' => 'Http/Controllers',
+                'console' => [
+                    'commands' => 'Console/Commands'
+                ]
             ],
             'routesPrefix' => $key,
             'routes' => []
