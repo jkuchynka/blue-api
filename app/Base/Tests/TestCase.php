@@ -6,7 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Str;
 use Base\Http\Controller;
-use Base\Services\Modules;
+use Base\Modules\ModulesService;
 use Base\Providers\ModuleServiceProvider;
 
 abstract class TestCase extends BaseTestCase
@@ -33,7 +33,7 @@ abstract class TestCase extends BaseTestCase
         // Only load specific modules before app is setup,
         // otherwise tests will use normal app config
         if ( ! empty($this->loadModules)) {
-            Modules::setEnabledModules($this->loadModules);
+            ModulesService::setEnabledModules($this->loadModules);
         }
         parent::setUp();
         $this->beforeTest();

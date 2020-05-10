@@ -7,7 +7,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
-use Base\Services\Modules;
+use Base\Modules\ModulesService;
 use Base\Database\SeedCommand;
 use Base\Console\Commands\ConsoleMakeCommand;
 
@@ -23,10 +23,10 @@ class ModuleServiceProvider extends ServiceProvider
         $this->app->singleton('modules', function ($app) {
             $config = $app->make(Repository::class);
             $yaml = $app->make(Yaml::class);
-            $modules = new Modules($config, $yaml);
-            $modules->loadModules($modules->getEnabledModules());
+            $modulesService = new ModulesService($config, $yaml);
+            $modulesService->loadModules($modulesService->getEnabledModules());
 
-            return $modules;
+            return $modulesService;
         });
 
         $this->app->singleton('command.seed', function ($app) {
@@ -41,14 +41,15 @@ class ModuleServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $modules = $this->app->make('modules');
+        $modulesService = $this->app->make('modules');
         $factory = $this->app->make(EloquentFactory::class);
         $migrator = $this->app->make('migrator');
 
-        $modulesConfig = $modules->getModules();
-        foreach ($modulesConfig as $module) {
-            // Load factories from modules
-            $path = $module['paths.module'] . '/' . $module['paths.factories'];
+        $modules = $modulesService->getModules();
+        foreach ($modules as $module) {
+
+            // Load module factories
+            $path = $module->path('factories');
             if (is_dir($path)) {
                 foreach (Finder::create()->files()->name('*Factory.php')->in($path) as $file) {
                     require $file->getRealPath();
@@ -56,7 +57,7 @@ class ModuleServiceProvider extends ServiceProvider
             }
 
             // Register module migration paths
-            $migrator->path($module['paths.module'] . '/' . $module['paths.migrations']);
+            $migrator->path($module->path('migrations'));
         }
     }
 }

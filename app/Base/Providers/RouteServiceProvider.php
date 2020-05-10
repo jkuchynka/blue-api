@@ -6,8 +6,7 @@ use Adbar\Dot;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Traits\ForwardsCalls;
-use Base\Services\Modules;
-use Base\Services\Routes;
+use Base\Modules\ModulesRoutes;
 
 /**
  * @mixin \Illuminate\Routing\Router
@@ -101,9 +100,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function loadRoutes()
     {
-        $modules = $this->app['modules'];
-        $modulesConfig = $modules->getModules();
-        $routes = new Routes($modulesConfig);
+        $modulesService = $this->app['modules'];
+        $modules = $modulesService->getModules();
+        $routes = new ModulesRoutes($modules);
         $routes->loadRoutes();
     }
 

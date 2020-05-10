@@ -1,6 +1,6 @@
 <?php
 
-namespace Base\Services;
+namespace Base\Modules;
 
 use Adbar\Dot;
 use Illuminate\Support\Str;
@@ -8,20 +8,20 @@ use Illuminate\Support\Facades\Route;
 use Base\Exceptions\InvalidRouteException;
 use Base\Services\Routes;
 
-class Routes
+class ModulesRoutes
 {
-    protected $modulesConfig;
+    protected $modules;
 
-    public function __construct(array $modulesConfig = [])
+    public function __construct(array $modules = [])
     {
-        $this->modulesConfig = $modulesConfig;
+        $this->modules = $modules;
     }
 
     public function loadRoutes()
     {
         $prefix = config('modules.routes.prefix');
         $middleware = config('modules.routes.middleware');
-        foreach ($this->modulesConfig as $key => $module) {
+        foreach ($this->modules as $key => $module) {
             $routes = $module->get('routes', []);
 
             // Add module routes as group

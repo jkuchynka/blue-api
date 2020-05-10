@@ -4,60 +4,46 @@ namespace Base\Tests\Unit;
 
 use Adbar\Dot;
 use Illuminate\Config\Repository;
-use Illuminate\Support\Facades\Route;
 use Symfony\Component\Yaml\Yaml;
 use org\bovigo\vfs\vfsStream;
-use Base\Services\Modules;
+use Base\Modules\ModulesService;
 
-class ModulesTest extends \Base\Tests\TestCase
+class ModulesServiceTest extends \Base\Tests\TestCase
 {
     protected $loadModules = ['base'];
 
     public function test_get_enabled_modules()
     {
-        $modules = new Modules;
-        $enabled = $modules->getEnabledModules();
+        $modulesService = new ModulesService;
+        $enabled = $modulesService->getEnabledModules();
         $this->assertEquals(['base'], $enabled);
-        $modules->loadModules($enabled);
-        $config = $modules->getModules();
-        $this->assertIsArray($config);
-        $this->assertInstanceOf(Dot::class, $config['base']);
-    }
-
-    public function test_get_module_config_default()
-    {
-        $modules = new Modules;
-        $config = $modules->moduleConfigDefault('foo_bar');
-        $this->assertIsArray($config);
-        $this->assertEquals('Database/Migrations', $config['paths']['migrations']);
-        $this->assertEquals('foo_bar', $config['key']);
-        $this->assertEquals('FooBar', $config['name']);
-        $this->assertStringContainsString('FooBar', $config['paths']['module']);
-        $this->assertEquals('App\\FooBar', $config['namespace']);
-
-        $config = $modules->moduleConfigDefault('base');
-        $this->assertEquals('Base', $config['namespace']);
+        $modulesService->loadModules($enabled);
+        $modules = $modulesService->getModules();
+        $this->assertIsArray($modules);
+        $this->assertInstanceOf(Dot::class, $modules['base']);
     }
 
     public function test_get_modules_path()
     {
         // Default
-        $modules = new Modules();
-        $this->assertEquals(base_path() . '/app', $modules->getModulesPath());
+        $modulesService = new ModulesService;
+        $this->assertEquals(base_path().'/app', $modulesService->getModulesPath());
 
         $options = [
-            ['modules', base_path() . '/modules'],
+            ['modules', base_path().'/modules'],
             ['/modules', '/modules'],
             ['vfs://root/modules', 'vfs://root/modules']
         ];
         foreach ($options as $option) {
             $repo = new Repository([
                 'modules' => [
-                    'modulesPath' => $option[0]
+                    'paths' => [
+                        'modules' => $option[0]
+                    ]
                 ]
             ]);
-            $modules = new Modules($repo);
-            $this->assertEquals($option[1], $modules->getModulesPath());
+            $modulesService = new ModulesService($repo);
+            $this->assertEquals($option[1], $modulesService->getModulesPath());
         }
     }
 
@@ -72,13 +58,13 @@ class ModulesTest extends \Base\Tests\TestCase
                 ]
             ]
         ]);
-        $modules = new Modules($repo);
-        $modules->loadModules(['foo', 'bar', 'baz']);
-        $config = $modules->getModules();
+        $modulesService = new ModulesService($repo);
+        $modulesService->loadModules(['foo', 'bar', 'baz']);
+        $modules = $modulesService->getModules();
 
-        $this->assertEquals('foo', $config['foo']['key']);
-        $this->assertEquals('Bar', $config['bar']['name']);
-        $this->assertEquals('App\\Baz', $config['baz']['namespace']);
+        $this->assertEquals('foo', $modules['foo']['key']);
+        $this->assertEquals('Bar', $modules['bar']['name']);
+        $this->assertEquals('App\\Baz', $modules['baz']['namespace']);
     }
 
     public function test_load_modules_with_yaml_config()
@@ -103,9 +89,9 @@ paths:
     migrations: db-migrations
                 ')
             ->at($root);
-        $modules = new Modules($repo);
-        $modules->loadModules(['foo']);
-        $foo = $modules->getModule('foo');
+        $modulesService = new ModulesService($repo);
+        $modulesService->loadModules(['foo']);
+        $foo = $modulesService->getModule('foo');
         $this->assertEquals('123', $foo['version']);
         $this->assertEquals('foobar', $foo['description']);
         $this->assertEquals('db-migrations', $foo['paths.migrations']);
@@ -136,9 +122,9 @@ paths:
     migrations: db-migrations
                 ')
             ->at($root);
-        $modules = new Modules($repo);
-        $modules->loadModules(['foo']);
-        $foo = $modules->getModule('foo');
+        $modulesService = new ModulesService($repo);
+        $modulesService->loadModules(['foo']);
+        $foo = $modulesService->getModule('foo');
         $this->assertEquals('123.123', $foo['version']);
         $this->assertEquals('Database', $foo['paths.migrations']);
         $this->assertEquals('CTRL', $foo['paths.controllers']);
@@ -155,22 +141,24 @@ routes:
 ';
         $root = vfsStream::setup('root', null, [
             'Foo' => [
-                'foo.config.yml' => $yaml
+                'foo.config.yaml' => $yaml
             ]
         ]);
         $repo = new Repository([
             'modules' => [
-                'modulesPath' => $root->url(),
+                'paths' => [
+                    'modules' => $root->url()
+                ],
                 'modules' => [
                     'foo' => []
                 ]
             ]
         ]);
 
-        $modules = new Modules($repo);
-        $modules->loadModules(['foo']);
+        $modulesService = new ModulesService($repo);
+        $modulesService->loadModules(['foo']);
 
-        $foo = $modules->getModule('foo');
+        $foo = $modulesService->getModule('foo');
         $this->assertEquals('foo', $foo['routes.0.route']);
     }
 
@@ -185,14 +173,24 @@ routes:
                 ]
             ]
         ]);
-        $modules = new Modules($repo);
-        $modules->loadModules(['foo']);
-        $config = $modules->getModules();
-        $this->assertInstanceOf(Dot::class, $config['bar']);
+        $modulesService = new ModulesService($repo);
+        $modulesService->loadModules(['foo']);
+        $modules = $modulesService->getModules();
+        $this->assertInstanceOf(Dot::class, $modules['bar']);
     }
 
-    public function _test_route_collision_throws_exception()
+    public function test_load_module_sets_module_path()
     {
-
+        $repo = new Repository([
+            'modules' => [
+                'modules' => [
+                    'foo_bar' => []
+                ]
+            ]
+        ]);
+        $modulesService = new ModulesService($repo);
+        $modulesService->loadModules(['foo_bar']);
+        $modules = $modulesService->getModules();
+        $this->assertEquals(base_path().'/app/FooBar', $modules['foo_bar']['paths.module']);
     }
 }
