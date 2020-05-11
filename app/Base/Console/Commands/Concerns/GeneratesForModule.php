@@ -14,12 +14,12 @@ trait GeneratesForModule
     abstract protected function getTargetPath();
 
     /**
-     * Get the replacement variables for the stub
+     * Get the default replacement variables for the stub
      *
      * @param string $name
      * @return array
      */
-    protected function getReplacements($name)
+    protected function getDefaultReplacements($name)
     {
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
         $namespace = $this->getNamespace($name);
@@ -64,6 +64,17 @@ trait GeneratesForModule
     }
 
     /**
+     * Get the replacement variables for the stub
+     *
+     * @param array $replacements
+     * @return array
+     */
+    protected function getReplacements($replacements)
+    {
+        return $replacements;
+    }
+
+    /**
      * Build the class with the given name.
      *
      * @param  string  $name
@@ -72,7 +83,9 @@ trait GeneratesForModule
     protected function buildClass($name)
     {
         $stub = $this->files->get($this->getStub());
-        $replacements = $this->getReplacements($name);
+
+        $replacements = $this->getDefaultReplacements($name);
+        $replacements = $this->getReplacements($replacements);
 
         $stub = str_replace(
             array_keys($replacements), array_values($replacements), $stub

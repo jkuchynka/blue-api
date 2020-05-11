@@ -42,6 +42,17 @@ class Module extends Dot
     }
 
     /**
+     * Get the module's namespace for a type
+     *
+     * @param string $type
+     * @return string
+     */
+    public function namespace(string $type)
+    {
+        return $this['namespace'].rtrim('\\', $this['paths.'.$type].'\\');
+    }
+
+    /**
      * Get the full module path
      *
      * @param string $type
