@@ -10,7 +10,7 @@ use Base\Modules\Module;
 use Base\Modules\ModulesService;
 use Base\Modules\ModulesRoutes;
 
-class RoutingTest extends \Base\Tests\TestCase
+class ModulesRoutingTest extends \Base\Tests\TestCase
 {
     protected $loadModules = ['base'];
 
