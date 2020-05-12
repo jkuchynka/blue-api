@@ -21,7 +21,7 @@ class Common
         if (pathinfo($path, PATHINFO_EXTENSION)) {
             array_pop($parts);
         }
-        return implode('\\', $parts);
+        return trim(implode('\\', $parts), '\\');
     }
 
     /**
