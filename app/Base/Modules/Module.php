@@ -53,7 +53,7 @@ class Module extends Dot
         return $type ?
             Common::namespaceCombine(
                 $this['namespace'],
-                Common::namespaceFromPath($this['paths.'.$type])
+                Common::namespaceFromPath((string) $this['paths.'.$type])
             ) :
             $this['namespace'];
     }
@@ -69,6 +69,6 @@ class Module extends Dot
         $path = $type ?
             $this['paths.module'].'/'.$this['paths.'.$type] :
             $this['paths.module'];
-        return rtrim($path, '/');
+        return (string) rtrim($path, '/');
     }
 }

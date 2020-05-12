@@ -11,7 +11,7 @@ use Base\Modules\ModulesRoutes;
 /**
  * @mixin \Illuminate\Routing\Router
  */
-class ModuleRouteServiceProvider extends ServiceProvider
+class ModulesRouteServiceProvider extends ServiceProvider
 {
     use ForwardsCalls;
 

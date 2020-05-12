@@ -5,7 +5,7 @@ namespace Blue\Tests\Unit;
 use Adbar\Dot;
 use Illuminate\Support\Facades\Route;
 use Base\Exceptions\InvalidRouteException;
-use Base\Providers\RouteServiceProvider;
+use Base\Providers\ModulesRouteServiceProvider;
 use Base\Modules\Module;
 use Base\Modules\ModulesService;
 use Base\Modules\ModulesRoutes;
@@ -17,10 +17,10 @@ class ModulesRoutingTest extends \Base\Tests\TestCase
     protected function setUp(): void
     {
         // Disable loading module routes
-        RouteServiceProvider::setLoadRoutes(false);
+        ModulesRouteServiceProvider::setLoadRoutes(false);
         parent::setUp();
         // Re-enable route loading
-        RouteServiceProvider::setLoadRoutes(true);
+        ModulesRouteServiceProvider::setLoadRoutes(true);
     }
 
     public function test_config_route_sets_uri()

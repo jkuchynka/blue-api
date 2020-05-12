@@ -11,7 +11,7 @@ use Base\Modules\ModulesService;
 use Base\Database\SeedCommand;
 use Base\Console\Commands\ConsoleMakeCommand;
 
-class ModuleServiceProvider extends ServiceProvider
+class ModulesServiceProvider extends ServiceProvider
 {
     /**
      * Register services.

@@ -87,6 +87,8 @@ trait GeneratesForModule
 
             $model = class_basename($namespaceModel);
 
+            $modelVariable = lcfirst($model);
+
             $replacements = array_merge($replacements, [
                 'NamespacedDummyModel' => $namespaceModel,
                 '{{ namespacedModel }}' => $namespaceModel,
@@ -94,6 +96,9 @@ trait GeneratesForModule
                 'DummyModel' => $model,
                 '{{ model }}' => $model,
                 '{{model}}' => $model,
+                'DummyModelVariable' => $modelVariable,
+                '{{ modelVariable }}' => $modelVariable,
+                '{{modelVariable}}' => $modelVariable
             ]);
         }
 

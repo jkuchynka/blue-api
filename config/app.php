@@ -174,8 +174,8 @@ return [
         Base\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         Base\Providers\EventServiceProvider::class,
-        Base\Providers\ModuleServiceProvider::class,
-        Base\Providers\ModuleRouteServiceProvider::class,
+        Base\Providers\ModulesServiceProvider::class,
+        Base\Providers\ModulesRouteServiceProvider::class,
 
     ],
 
