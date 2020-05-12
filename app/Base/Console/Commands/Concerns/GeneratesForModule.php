@@ -2,6 +2,7 @@
 
 namespace Base\Console\Commands\Concerns;
 
+use Base\Helpers\Common;
 use Illuminate\Support\Str;
 
 trait GeneratesForModule
@@ -12,6 +13,41 @@ trait GeneratesForModule
      * @return string
      */
     abstract protected function getTargetPath();
+
+    /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function handle()
+    {
+        $path = $this->getPath($this->getNameInput());
+
+        $name = $this->qualifyClass($path);
+
+        // First we will check to see if the class already exists. If it does, we don't want
+        // to create the class and overwrite the user's code. So, we will bail out so the
+        // code is untouched. Otherwise, we will continue generating this class' files.
+        if ((! $this->hasOption('force') ||
+             ! $this->option('force')) &&
+             $this->files->exists($path)
+            ) {
+            $this->error($this->type.' already exists!');
+
+            return false;
+        }
+
+        // Next, we will generate the path to the location where this class' file should get
+        // written. Then, we will build the class and make the proper replacements on the
+        // stub files so that it gets the correctly formatted namespace and class name.
+        $this->makeDirectory($path);
+
+        $this->files->put($path, $this->sortImports($this->buildClass($name)));
+
+        $this->info($this->type.' created successfully.');
+    }
 
     /**
      * Get the default replacement variables for the stub
@@ -46,7 +82,8 @@ trait GeneratesForModule
 
         if ($this->hasOption('model')) {
             $model = $this->option('model') ? $this->option('model') : 'Model';
-            $namespaceModel = $this->getModule()['namespace'] . rtrim('\\' . str_replace('/', '\\', $this->getModule()['paths.models']), '\\') . '\\' . $model;
+
+            $namespaceModel = $this->getModule()->namespace('models').'\\'.$model;
 
             $model = class_basename($namespaceModel);
 
@@ -95,21 +132,6 @@ trait GeneratesForModule
     }
 
     /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        $path = $this->getTargetPath();
-        $module = $this->getModule();
-        $namespace = $rootNamespace;
-        $namespace .= $path ? '\\' . str_replace('/', '\\', $path) : '';
-        return $namespace;
-    }
-
-    /**
      * Get the destination class path.
      *
      * @param  string  $name
@@ -117,20 +139,25 @@ trait GeneratesForModule
      */
     protected function getPath($name)
     {
-        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
-
-        return $this->getModule()['paths.module'] . '/' . str_replace('\\', '/', $name).'.php';
+        return rtrim($this->getTargetPath(), '/').'/'.$name.'.php';
     }
 
     /**
-     * Get the root namespace for the class.
+     * Return the qualified class based on the path
      *
+     * @param  string  $path
      * @return string
      */
-    protected function rootNamespace()
+    protected function qualifyClass($path)
     {
-        return $this->getModule()['namespace'];
+        $module = $this->getModule();
+
+        // Get relative path from module root
+        $relative = ltrim(str_replace($module->path(), '', $path), '/');
+        $namespace = Common::namespaceFromPath($relative);
+
+        // Combine module namespace, relative namespace and class name
+        $class = pathinfo($path, PATHINFO_FILENAME);
+        return Common::namespaceCombine($module->namespace(), $namespace).'\\'.$class;
     }
-
-
 }

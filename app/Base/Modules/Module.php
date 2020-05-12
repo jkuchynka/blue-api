@@ -3,6 +3,7 @@
 namespace Base\Modules;
 
 use Adbar\Dot;
+use Base\Helpers\Common;
 use Illuminate\Support\Str;
 
 class Module extends Dot
@@ -42,24 +43,32 @@ class Module extends Dot
     }
 
     /**
-     * Get the module's namespace for a type
+     * Get the module's full namespace for a type
      *
      * @param string $type
      * @return string
      */
-    public function namespace(string $type)
+    public function namespace(string $type = null)
     {
-        return $this['namespace'].rtrim('\\', $this['paths.'.$type].'\\');
+        return $type ?
+            Common::namespaceCombine(
+                $this['namespace'],
+                Common::namespaceFromPath($this['paths.'.$type])
+            ) :
+            $this['namespace'];
     }
 
     /**
-     * Get the full module path
+     * Get the full module path for a type
      *
      * @param string $type
      * @return string
      */
-    public function path(string $type)
+    public function path(string $type = null)
     {
-        return $this['paths.module'].'/'.$this['paths.'.$type];
+        $path = $type ?
+            $this['paths.module'].'/'.$this['paths.'.$type] :
+            $this['paths.module'];
+        return rtrim($path, '/');
     }
 }

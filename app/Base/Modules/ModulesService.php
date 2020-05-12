@@ -82,11 +82,24 @@ class ModulesService
     }
 
     /**
-     * Get all enabled modules and setup their config
+     * Load modules and setup their config
      *
+     * @param array $modules
      * @return void
      */
     public function loadModules(array $modules): void
+    {
+        $this->modules = [];
+        $this->doLoadModules($modules);
+    }
+
+    /**
+     * Load modules and setup their config
+     *
+     * @param array $modules
+     * @return void
+     */
+    protected function doLoadModules(array $modules): void
     {
         // Setup each module's config from default, yaml then app
         foreach ($modules as $key) {
@@ -123,7 +136,7 @@ class ModulesService
             // make sure they are loaded as well
             $keys = array_diff($module['dependsOn'], $modules, array_keys($this->modules));
             if ($keys) {
-                $this->loadModules($keys);
+                $this->doLoadModules($keys);
             }
         }
     }
