@@ -15,7 +15,8 @@ return [
     'modules' => [
         'base' => [],
         'messages' => [],
-        'users' => []
+	'users' => [],
+	'test' => []
     ]
 
 ];

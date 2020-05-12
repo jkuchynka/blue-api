@@ -19,7 +19,7 @@ class ControllerMakeCommand extends BaseCommand
      */
     protected function getTargetPath()
     {
-        return $this->getModule()['paths.controllers'];
+        return $this->getModule()->path('controllers');
     }
 
     /**

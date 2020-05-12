@@ -2,12 +2,32 @@
 
 namespace Base\Console\Commands;
 
-use Illuminate\Foundation\Console\ConsoleMakeCommand as BaseConsoleMakeCommand;
+use Illuminate\Foundation\Console\ConsoleMakeCommand as BaseCommand;
+use Illuminate\Support\Str;
 
-class ConsoleMakeCommand extends BaseConsoleMakeCommand
+class ConsoleMakeCommand extends BaseCommand
 {
     use Concerns\HasModuleArgument,
         Concerns\GeneratesForModule;
+
+    /**
+     * Get the replacement variables for the stub
+     *
+     * @param array $replacements
+     * @return array
+     */
+    protected function getReplacements($replacements)
+    {
+        $module = $this->getModule();
+        $command = $module['key'].':'.Str::of($this->getNameInput())
+            ->replace('Command', '')
+            ->replaceMatches('/([A-Z])/', ' $1')
+            ->slug();
+        $replacements = array_merge($replacements, [
+            '{{ command }}' => $command
+        ]);
+        return $replacements;
+    }
 
     /**
      * Get the path for the built class
@@ -16,7 +36,7 @@ class ConsoleMakeCommand extends BaseConsoleMakeCommand
      */
     protected function getTargetPath()
     {
-        return $this->getModule()['paths.commands'];
+        return $this->getModule()->path('commands');
     }
 
     /**

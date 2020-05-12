@@ -10,6 +10,8 @@ paths:
   factories: Database
   migrations: Database
   seeds: Database
+  console:
+    commands: Commands
 routes:
   -
     uri: /users
