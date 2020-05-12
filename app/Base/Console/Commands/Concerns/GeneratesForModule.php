@@ -81,6 +81,7 @@ trait GeneratesForModule
         ];
 
         if ($this->hasOption('model')) {
+
             $model = $this->option('model') ? $this->option('model') : 'Model';
 
             $namespaceModel = $this->getModule()->namespace('models').'\\'.$model;

@@ -20,6 +20,33 @@ class ConsoleCommandsTest extends CommandsTestCase
         $this->assertStringContainsString('$name = \'foo_bar:foo-bar', $contents);
     }
 
+    public function test_factory_make_command()
+    {
+        $this->artisan('make:factory', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarFactory'
+        ]);
+
+        $path = 'FooBar/Database/Factories/FooBarFactory.php';
+        $this->assertTrue($this->root->hasChild($path));
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('use App\\FooBar\\Models\\Model', $contents);
+        $this->assertStringContainsString('define(Model', $contents);
+
+        $this->artisan('make:factory', [
+            'module' => 'foo_bar',
+            'name' => 'FooFactory',
+            '--model' => 'Foo'
+        ]);
+
+        $path = 'FooBar/Database/Factories/FooFactory.php';
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('use App\\FooBar\\Models\\Foo', $contents);
+        $this->assertStringContainsString('define(Foo', $contents);
+    }
+
     public function test_seeder_make_command()
     {
         $this->artisan('make:seeder', [

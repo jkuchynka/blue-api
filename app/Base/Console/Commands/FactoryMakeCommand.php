@@ -16,7 +16,7 @@ class FactoryMakeCommand extends BaseCommand
      */
     protected function getTargetPath()
     {
-        return $this->getModule()['paths.factories'];
+        return $this->getModule()->path('factories');
     }
 
     /**
