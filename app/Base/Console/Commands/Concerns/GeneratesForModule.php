@@ -77,7 +77,9 @@ trait GeneratesForModule
 
             'NamespacedDummyUserModel' => $userModel,
             '{{ namespacedUserModel }}' => $userModel,
-            '{{namespacedUserModel}}' => $userModel
+            '{{namespacedUserModel}}' => $userModel,
+
+            'DummyUser' => class_basename($userModel),
         ];
 
         if ($this->hasOption('model')) {

@@ -4,6 +4,23 @@ namespace Base\Tests\Feature\Console;
 
 class ConsoleCommandsTest extends CommandsTestCase
 {
+    public function test_channel_make_command()
+    {
+        $this->artisan('make:channel', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarChannel'
+        ]);
+
+        $path = 'FooBar/Broadcasting/FooBarChannel.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Broadcasting;', $contents);
+        $this->assertStringContainsString('use App\\Users\\User;', $contents);
+        $this->assertStringContainsString('class FooBarChannel', $contents);
+        $this->assertStringContainsString('User $user', $contents);
+    }
+
     public function test_console_make_command()
     {
         $this->artisan('make:command', [
@@ -18,6 +35,36 @@ class ConsoleCommandsTest extends CommandsTestCase
         $this->assertStringContainsString('namespace App\\FooBar\\Console\\Commands;', $contents);
         $this->assertStringContainsString('class FooBarCommand ', $contents);
         $this->assertStringContainsString('$name = \'foo_bar:foo-bar', $contents);
+    }
+
+    public function test_event_make_command()
+    {
+        $this->artisan('make:event', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarEvent'
+        ]);
+
+        $path = 'FooBar/Events/FooBarEvent.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Events;', $contents);
+        $this->assertStringContainsString('class FooBarEvent', $contents);
+    }
+
+    public function test_exception_make_command()
+    {
+        $this->artisan('make:exception', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarException'
+        ]);
+
+        $path = 'FooBar/Exceptions/FooBarException.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Exceptions;', $contents);
+        $this->assertStringContainsString('class FooBarException ', $contents);
     }
 
     public function test_factory_make_command()
@@ -46,6 +93,54 @@ class ConsoleCommandsTest extends CommandsTestCase
 
         $this->assertStringContainsString('use App\\FooBar\\Models\\Foo', $contents);
         $this->assertStringContainsString('define(Foo', $contents);
+    }
+
+    public function test_job_make_command()
+    {
+        $this->artisan('make:job', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarJob'
+        ]);
+
+        $path = 'FooBar/Jobs/FooBarJob.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Jobs;', $contents);
+        $this->assertStringContainsString('class FooBarJob ', $contents);
+    }
+
+    public function test_listener_make_command()
+    {
+        $this->artisan('make:listener', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarListener'
+        ]);
+
+        $path = 'FooBar/Listeners/FooBarListener.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Listeners;', $contents);
+        $this->assertStringContainsString('class FooBarListener', $contents);
+    }
+
+    public function test_listener_make_command_event()
+    {
+        $this->artisan('make:listener', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarListener',
+            '--event' => 'FooBarEvent'
+        ]);
+
+        $path = 'FooBar/Listeners/FooBarListener.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Listeners;', $contents);
+        $this->assertStringContainsString('use App\\FooBar\\Events\\FooBarEvent;', $contents);
+        $this->assertStringContainsString('class FooBarListener', $contents);
+        $this->assertStringContainsString('FooBarEvent $event', $contents);
     }
 
     public function test_migration_make_command()
