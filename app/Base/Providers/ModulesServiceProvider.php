@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Base\Modules\ModulesService;
+use Illuminate\Database\Migrations\MigrationCreator;
 use Base\Database\SeedCommand;
 use Base\Console\Commands\ConsoleMakeCommand;
 
@@ -32,6 +33,14 @@ class ModulesServiceProvider extends ServiceProvider
         $this->app->singleton('command.seed', function ($app) {
             return new SeedCommand($app['db']);
         });
+
+        // Fix unresolvable dependency error when resolving $customStubPath
+        // in MigrationCreator
+        $this->app->when(MigrationCreator::class)
+            ->needs('$customStubPath')
+            ->give(function ($app) {
+                return $app->basePath('stubs');
+            });
     }
 
     /**

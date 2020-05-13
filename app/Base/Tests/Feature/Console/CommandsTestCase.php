@@ -5,6 +5,7 @@ namespace Base\Tests\Feature\Console;
 use Base\Modules\ModulesService;
 use Base\Tests\TestCase;
 use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
 use Illuminate\Config\Repository;
 use Symfony\Component\Yaml\Yaml;
 
@@ -37,5 +38,25 @@ abstract class CommandsTestCase extends TestCase
 
             return $modulesService;
         });
+    }
+
+    protected function tearDown(): void
+    {
+        $this->root = null;
+    }
+
+    /**
+     * Assert that the command generates a file at a path
+     *
+     * @param  string $path
+     * @return void
+     */
+    protected function assertCommandPath($path)
+    {
+        if (! $this->root->hasChild($path)) {
+            $visitor = new vfsStreamStructureVisitor;
+            $visitor->visitDirectory($this->root);
+            $this->fail('Command expected new class at path: '.$path.', filesystem: '.print_r($visitor->getStructure(), true));
+        }
     }
 }
