@@ -143,6 +143,40 @@ class ConsoleCommandsTest extends CommandsTestCase
         $this->assertStringContainsString('FooBarEvent $event', $contents);
     }
 
+    public function test_mail_make_command()
+    {
+        $this->artisan('make:mail', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarMail',
+            '--markdown' => 'foobar'
+        ]);
+
+        $path = 'FooBar/Mail/FooBarMail.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertCommandPath('FooBar/Views/foobar.blade.php');
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Mail;', $contents);
+        $this->assertStringContainsString('class FooBarMail', $contents);
+        $this->assertStringContainsString('markdown(\'foobar', $contents);
+    }
+
+    public function test_middleware_make_command()
+    {
+        $this->artisan('make:middleware', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarMiddleware'
+        ]);
+
+        $path = 'FooBar/Http/Middleware/FooBarMiddleware.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Http\\Middleware;', $contents);
+        $this->assertStringContainsString('class FooBarMiddleware', $contents);
+    }
+
     public function test_migration_make_command()
     {
         $this->artisan('make:migration', [
@@ -162,6 +196,92 @@ class ConsoleCommandsTest extends CommandsTestCase
 
         $this->assertStringContainsString('create_foo_table', $file->getName());
         $this->assertStringContainsString('class CreateFooTable ', $contents);
+    }
+
+    public function test_notification_make_command()
+    {
+        $this->artisan('make:notification', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarNotification',
+            '--markdown' => 'foobar'
+        ]);
+
+        $path = 'FooBar/Notifications/FooBarNotification.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertCommandPath('FooBar/Views/foobar.blade.php');
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Notifications;', $contents);
+        $this->assertStringContainsString('class FooBarNotification', $contents);
+        $this->assertStringContainsString('markdown(\'foobar', $contents);
+    }
+
+    public function test_observer_make_command()
+    {
+        $this->artisan('make:observer', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarObserver',
+            '--model' => 'Foo'
+        ]);
+
+        $path = 'FooBar/Observers/FooBarObserver.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Observers;', $contents);
+        $this->assertStringContainsString('use App\\FooBar\\Models\\Foo', $contents);
+        $this->assertStringContainsString('class FooBarObserver', $contents);
+        $this->assertStringContainsString('Foo $foo', $contents);
+    }
+
+    public function test_policy_make_command()
+    {
+        $this->artisan('make:policy', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarPolicy',
+            '--model' => 'Foo'
+        ]);
+
+        $path = 'FooBar/Policies/FooBarPolicy.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Policies;', $contents);
+        $this->assertStringContainsString('use App\\FooBar\\Models\\Foo', $contents);
+        $this->assertStringContainsString('use App\\Users\\User', $contents);
+        $this->assertStringContainsString('class FooBarPolicy', $contents);
+        $this->assertStringContainsString('User $user, Foo $foo', $contents);
+    }
+
+    public function test_provider_make_command()
+    {
+        $this->artisan('make:provider', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarProvider'
+        ]);
+
+        $path = 'FooBar/Providers/FooBarProvider.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Providers;', $contents);
+        $this->assertStringContainsString('class FooBarProvider', $contents);
+    }
+
+    public function test_request_make_command()
+    {
+        $this->artisan('make:request', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarRequest'
+        ]);
+
+        $path = 'FooBar/Http/Requests/FooBarRequest.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Http\\Requests;', $contents);
+        $this->assertStringContainsString('class FooBarRequest', $contents);
     }
 
     public function test_resource_make_command()
@@ -192,6 +312,21 @@ class ConsoleCommandsTest extends CommandsTestCase
         $this->assertStringContainsString('class FooBarCollection ', $contents);
     }
 
+    public function test_rule_make_command()
+    {
+        $this->artisan('make:rule', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarRule'
+        ]);
+
+        $path = 'FooBar/Rules/FooBarRule.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Rules;', $contents);
+        $this->assertStringContainsString('class FooBarRule', $contents);
+    }
+
     public function test_seeder_make_command()
     {
         $this->artisan('make:seeder', [
@@ -205,5 +340,38 @@ class ConsoleCommandsTest extends CommandsTestCase
 
         $this->assertStringContainsString('namespace App\\FooBar\\Database\\Seeds;', $contents);
         $this->assertStringContainsString('class FooBarSeeder ', $contents);
+    }
+
+    public function test_test_make_command()
+    {
+        $this->artisan('make:test', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarTest'
+        ]);
+
+        $path = 'FooBar/Tests/Feature/FooBarTest.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Tests\\Feature;', $contents);
+        $this->assertStringContainsString('use Base\\Tests\\TestCase;', $contents);
+        $this->assertStringContainsString('class FooBarTest', $contents);
+    }
+
+    public function test_test_make_command_unit()
+    {
+        $this->artisan('make:test', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarTest',
+            '--unit' => true
+        ]);
+
+        $path = 'FooBar/Tests/Unit/FooBarTest.php';
+        $this->assertCommandPath($path);
+        $contents = $this->root->getChild($path)->getContent();
+
+        $this->assertStringContainsString('namespace App\\FooBar\\Tests\\Unit;', $contents);
+        $this->assertStringContainsString('use Base\\Tests\\TestCase;', $contents);
+        $this->assertStringContainsString('class FooBarTest', $contents);
     }
 }

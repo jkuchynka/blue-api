@@ -80,6 +80,7 @@ trait GeneratesForModule
             '{{namespacedUserModel}}' => $userModel,
 
             'DummyUser' => class_basename($userModel),
+            '{{ user }}' => class_basename($userModel),
         ];
 
         if ($this->hasOption('model')) {
@@ -99,6 +100,7 @@ trait GeneratesForModule
                 'DummyModel' => $model,
                 '{{ model }}' => $model,
                 '{{model}}' => $model,
+                'dummyModel' => $modelVariable,
                 'DummyModelVariable' => $modelVariable,
                 '{{ modelVariable }}' => $modelVariable,
                 '{{modelVariable}}' => $modelVariable
