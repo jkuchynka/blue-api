@@ -35,4 +35,20 @@ class Common
     {
         return ltrim($baseNamespace.rtrim('\\'.$namespace, '\\'), '\\');
     }
+
+    /**
+     * Get a path from a namespace
+     *
+     * @param  string $namespace
+     * @param  bool $stripClass
+     * @return string
+     */
+    public static function namespaceToPath(string $namespace, bool $stripClass = false)
+    {
+        $namespace = trim($namespace, '\\');
+        if ($stripClass) {
+            return str_replace('\\', '/', $namespace);
+        }
+        return str_replace('\\', '/', preg_replace('/\\.*?/', '', $namespace));
+    }
 }

@@ -52,6 +52,63 @@ class ControllerMakeCommand extends BaseCommand
     }
 
     /**
+     * Build the replacements for a parent controller.
+     *
+     * @return array
+     */
+    protected function buildParentReplacements()
+    {
+        $parentModelClass = $this->parseModel($this->option('parent'));
+
+        if (! class_exists($parentModelClass, false)) {
+            if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
+                $this->call('make:model', ['module' => $this->getModule()['key'], 'name' => $parentModelClass]);
+            }
+        }
+
+        return [
+            'ParentDummyFullModelClass' => $parentModelClass,
+            '{{ namespacedParentModel }}' => $parentModelClass,
+            '{{namespacedParentModel}}' => $parentModelClass,
+            'ParentDummyModelClass' => class_basename($parentModelClass),
+            '{{ parentModel }}' => class_basename($parentModelClass),
+            '{{parentModel}}' => class_basename($parentModelClass),
+            'ParentDummyModelVariable' => lcfirst(class_basename($parentModelClass)),
+            '{{ parentModelVariable }}' => lcfirst(class_basename($parentModelClass)),
+            '{{parentModelVariable}}' => lcfirst(class_basename($parentModelClass)),
+        ];
+    }
+
+    /**
+     * Build the model replacement values.
+     *
+     * @param  array  $replace
+     * @return array
+     */
+    protected function buildModelReplacements(array $replace)
+    {
+        $modelClass = $this->parseModel($this->option('model'));
+
+        if (! class_exists($modelClass)) {
+            if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
+                $this->call('make:model', ['module' => $this->getModule()['key'], 'name' => $modelClass]);
+            }
+        }
+
+        return array_merge($replace, [
+            'DummyFullModelClass' => $modelClass,
+            '{{ namespacedModel }}' => $modelClass,
+            '{{namespacedModel}}' => $modelClass,
+            'DummyModelClass' => class_basename($modelClass),
+            '{{ model }}' => class_basename($modelClass),
+            '{{model}}' => class_basename($modelClass),
+            'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+            '{{ modelVariable }}' => lcfirst(class_basename($modelClass)),
+            '{{modelVariable}}' => lcfirst(class_basename($modelClass)),
+        ]);
+    }
+
+    /**
      * Get the fully-qualified model class name.
      *
      * @param  string  $model

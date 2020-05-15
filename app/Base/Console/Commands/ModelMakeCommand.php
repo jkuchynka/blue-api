@@ -2,7 +2,6 @@
 
 namespace Base\Console\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Foundation\Console\ModelMakeCommand as BaseCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -10,6 +9,57 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ModelMakeCommand extends BaseCommand
 {
+    use Concerns\HasModuleArgument;
+    use Concerns\GeneratesForModule {
+        handle as generatesHandle;
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        if ($this->generatesHandle() === false && ! $this->option('force')) {
+            return;
+        }
+
+         if ($this->option('all')) {
+            $this->input->setOption('factory', true);
+            $this->input->setOption('seed', true);
+            $this->input->setOption('migration', true);
+            $this->input->setOption('controller', true);
+            $this->input->setOption('resource', true);
+        }
+
+        if ($this->option('factory')) {
+            $this->createFactory();
+        }
+
+        if ($this->option('migration')) {
+            $this->createMigration();
+        }
+
+        if ($this->option('seed')) {
+            $this->createSeeder();
+        }
+
+        if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
+            $this->createController();
+        }
+    }
+
+    /**
+     * Get the path for the built class
+     *
+     * @return string
+     */
+    protected function getTargetPath()
+    {
+        return $this->getModule()->path('models');
+    }
+
     /**
      * Create a model factory for the model.
      *
@@ -20,6 +70,7 @@ class ModelMakeCommand extends BaseCommand
         $factory = Str::studly(class_basename($this->argument('name')));
 
         $this->call('make:factory', [
+            'module' => $this->getModule()['key'],
             'name' => "{$factory}Factory",
             '--model' => $this->qualifyClass($this->getNameInput()),
         ]);
@@ -39,6 +90,7 @@ class ModelMakeCommand extends BaseCommand
         }
 
         $this->call('make:migration', [
+            'module' => $this->getModule()['key'],
             'name' => "create_{$table}_table",
             '--create' => $table,
         ]);
@@ -54,6 +106,7 @@ class ModelMakeCommand extends BaseCommand
         $seeder = Str::studly(class_basename($this->argument('name')));
 
         $this->call('make:seed', [
+            'module' => $this->getModule()['key'],
             'name' => "{$seeder}Seeder",
         ]);
     }
@@ -70,6 +123,7 @@ class ModelMakeCommand extends BaseCommand
         $modelName = $this->qualifyClass($this->getNameInput());
 
         $this->call('make:controller', array_filter([
+            'module' => $this->getModule()['key'],
             'name'  => "{$controller}Controller",
             '--model' => $this->option('resource') || $this->option('api') ? $modelName : null,
             '--api' => $this->option('api'),
@@ -77,16 +131,15 @@ class ModelMakeCommand extends BaseCommand
     }
 
     /**
-     * Get the console command arguments.
+     * Get the stub file for the generator.
      *
-     * @return array
+     * @return string
      */
-    protected function getArguments()
+    protected function getStub()
     {
-        return [
-            ['model', InputArgument::REQUIRED, 'The name or key of the module'],
-            ['name', InputArgument::REQUIRED, 'The name of the class'],
-        ];
+        return $this->option('pivot')
+                    ? __DIR__.('/stubs/model.pivot.stub')
+                    : __DIR__.('/stubs/model.stub');
     }
 
     /**

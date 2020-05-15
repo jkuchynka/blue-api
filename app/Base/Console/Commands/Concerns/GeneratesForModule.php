@@ -149,7 +149,21 @@ trait GeneratesForModule
      */
     protected function getPath($name)
     {
-        return rtrim($this->getTargetPath(), '/').'/'.$name.'.php';
+        // Allow for handling namespaced class, module path or relative path
+        $pathed = str_replace('\\', '/', $name);
+
+        $namespacedClass = Common::namespaceFromPath($pathed);
+
+        // If fully namespaced and starts with module namespace,
+        // it should use the namespaced class path
+        $moduleNamespace = $this->getModule()->namespace();
+        if (Str::of($namespacedClass)->contains($moduleNamespace)) {
+            $relativeNamespacedClass = str_replace($moduleNamespace, '', $namespacedClass);
+            return $this->getModule()->path().'/'.Common::namespaceToPath($relativeNamespacedClass).'.php';
+        }
+
+        // File will go in target path
+        return $this->getTargetPath().'/'.Common::namespaceToPath($namespacedClass).'.php';
     }
 
     /**

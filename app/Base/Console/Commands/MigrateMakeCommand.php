@@ -36,7 +36,9 @@ class MigrateMakeCommand extends BaseCommand
             $path = $this->getTargetPath();
         }
 
-        File::makeDirectory($path, 0755, true);
+        if (! File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
 
         return $path;
     }
