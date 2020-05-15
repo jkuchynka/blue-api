@@ -72,7 +72,7 @@ class ModelMakeCommand extends BaseCommand
         $this->call('make:factory', [
             'module' => $this->getModule()['key'],
             'name' => "{$factory}Factory",
-            '--model' => $this->qualifyClass($this->getNameInput()),
+            '--model' => $this->argument('name'),
         ]);
     }
 
@@ -120,13 +120,12 @@ class ModelMakeCommand extends BaseCommand
     {
         $controller = Str::studly(class_basename($this->argument('name')));
 
-        $modelName = $this->qualifyClass($this->getNameInput());
-
         $this->call('make:controller', array_filter([
             'module' => $this->getModule()['key'],
             'name'  => "{$controller}Controller",
-            '--model' => $this->option('resource') || $this->option('api') ? $modelName : null,
+            '--model' => $this->option('resource') || $this->option('api') ? $this->argument('name') : null,
             '--api' => $this->option('api'),
+            '--querybuilder' => $this->option('querybuilder')
         ]));
     }
 
@@ -149,16 +148,8 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getOptions()
     {
-        return [
-            ['all', 'a', InputOption::VALUE_NONE, 'Generate a migration, seeder, factory, and resource controller for the model'],
-            ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model'],
-            ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
-            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
-            ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
-            ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder file for the model'],
-            ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
-            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
-            ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
-        ];
+        $options = parent::getOptions();
+        $options[] = ['querybuilder', 'b', InputOption::VALUE_NONE, 'Generate an api controller with query builder methods'];
+        return $options;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Base\Console\Commands;
 
+use Base\Helpers\Common;
 use Illuminate\Routing\Console\ControllerMakeCommand as BaseCommand;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -60,7 +61,7 @@ class ControllerMakeCommand extends BaseCommand
     {
         $parentModelClass = $this->parseModel($this->option('parent'));
 
-        if (! class_exists($parentModelClass, false)) {
+        if (! class_exists($parentModelClass)) {
             if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
                 $this->call('make:model', ['module' => $this->getModule()['key'], 'name' => $parentModelClass]);
             }
@@ -122,17 +123,12 @@ class ControllerMakeCommand extends BaseCommand
             throw new InvalidArgumentException('Model name contains invalid characters.');
         }
 
-        $model = trim(str_replace('/', '\\', $model), '\\');
-
-        $module = $this->getModule();
-        $modelNamespace = $module['namespace'];
-        $modelNamespace .= rtrim(str_replace('/', '\\', '\\' . $module['paths.models']), '\\') . '\\';
-
-        if (! Str::startsWith($model, $module['namespace'])) {
-            $model = $modelNamespace.$model;
-        }
-
-        return $model;
+        $path = $this->getModule()->path('models').'/'.Common::namespaceToPath($model).'.php';
+        $class = $this->qualifyClass($path);
+        // print_r([$path, $class]);
+        // echo 'path: '.file_exists('vfs://root/app/FooBar/Models/FooBar.php');
+        // die;
+        return $class;
     }
 
     /**

@@ -157,7 +157,7 @@ trait GeneratesForModule
         // If fully namespaced and starts with module namespace,
         // it should use the namespaced class path
         $moduleNamespace = $this->getModule()->namespace();
-        if (Str::of($namespacedClass)->contains($moduleNamespace)) {
+        if ($name != $moduleNamespace && Str::of($namespacedClass)->contains($moduleNamespace)) {
             $relativeNamespacedClass = str_replace($moduleNamespace, '', $namespacedClass);
             return $this->getModule()->path().'/'.Common::namespaceToPath($relativeNamespacedClass).'.php';
         }

@@ -11,11 +11,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarChannel'
         ]);
 
-        $path = 'FooBar/Broadcasting/FooBarChannel.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Broadcasting/FooBarChannel.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Broadcasting;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Broadcasting;', $contents);
         $this->assertStringContainsString('use App\\Users\\User;', $contents);
         $this->assertStringContainsString('class FooBarChannel', $contents);
         $this->assertStringContainsString('User $user', $contents);
@@ -28,11 +26,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarCommand'
         ]);
 
-        $path = 'FooBar/Console/Commands/FooBarCommand.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Console/Commands/FooBarCommand.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Console\\Commands;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Console\\Commands;', $contents);
         $this->assertStringContainsString('class FooBarCommand ', $contents);
         $this->assertStringContainsString('$name = \'foo_bar:foo-bar', $contents);
     }
@@ -44,11 +40,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarEvent'
         ]);
 
-        $path = 'FooBar/Events/FooBarEvent.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Events/FooBarEvent.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Events;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Events;', $contents);
         $this->assertStringContainsString('class FooBarEvent', $contents);
     }
 
@@ -59,11 +53,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarException'
         ]);
 
-        $path = 'FooBar/Exceptions/FooBarException.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Exceptions/FooBarException.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Exceptions;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Exceptions;', $contents);
         $this->assertStringContainsString('class FooBarException ', $contents);
     }
 
@@ -74,11 +66,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarFactory'
         ]);
 
-        $path = 'FooBar/Database/Factories/FooBarFactory.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Database/Factories/FooBarFactory.php');
 
-        $this->assertStringContainsString('use App\\FooBar\\Models\\Model', $contents);
+        $this->assertStringContainsString('use VFS\\FooBar\\Models\\Model', $contents);
         $this->assertStringContainsString('define(Model', $contents);
 
         $this->artisan('make:factory', [
@@ -87,11 +77,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--model' => 'Foo'
         ]);
 
-        $path = 'FooBar/Database/Factories/FooFactory.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Database/Factories/FooFactory.php');
 
-        $this->assertStringContainsString('use App\\FooBar\\Models\\Foo', $contents);
+        $this->assertStringContainsString('use VFS\\FooBar\\Models\\Foo', $contents);
         $this->assertStringContainsString('define(Foo', $contents);
     }
 
@@ -102,11 +90,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarJob'
         ]);
 
-        $path = 'FooBar/Jobs/FooBarJob.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Jobs/FooBarJob.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Jobs;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Jobs;', $contents);
         $this->assertStringContainsString('class FooBarJob ', $contents);
     }
 
@@ -117,11 +103,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarListener'
         ]);
 
-        $path = 'FooBar/Listeners/FooBarListener.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Listeners/FooBarListener.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Listeners;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Listeners;', $contents);
         $this->assertStringContainsString('class FooBarListener', $contents);
     }
 
@@ -133,12 +117,10 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--event' => 'FooBarEvent'
         ]);
 
-        $path = 'FooBar/Listeners/FooBarListener.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Listeners/FooBarListener.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Listeners;', $contents);
-        $this->assertStringContainsString('use App\\FooBar\\Events\\FooBarEvent;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Listeners;', $contents);
+        $this->assertStringContainsString('use VFS\\FooBar\\Events\\FooBarEvent;', $contents);
         $this->assertStringContainsString('class FooBarListener', $contents);
         $this->assertStringContainsString('FooBarEvent $event', $contents);
     }
@@ -151,13 +133,11 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--markdown' => 'foobar'
         ]);
 
-        $path = 'FooBar/Mail/FooBarMail.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Mail/FooBarMail.php');
 
-        $this->assertCommandPath('FooBar/Views/foobar.blade.php');
+        $this->assertCommandPath('Views/foobar.blade.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Mail;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Mail;', $contents);
         $this->assertStringContainsString('class FooBarMail', $contents);
         $this->assertStringContainsString('markdown(\'foobar', $contents);
     }
@@ -169,11 +149,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarMiddleware'
         ]);
 
-        $path = 'FooBar/Http/Middleware/FooBarMiddleware.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Http/Middleware/FooBarMiddleware.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Http\\Middleware;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Http\\Middleware;', $contents);
         $this->assertStringContainsString('class FooBarMiddleware', $contents);
     }
 
@@ -184,14 +162,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'create_foo_table'
         ]);
 
-        $path = 'FooBar/Database/Migrations';
-        $this->assertCommandPath($path);
+        $dir = $this->assertCommandPath('Database/Migrations');
 
-        $file = $this->root
-            ->getChild('FooBar')
-            ->getChild('Database')
-            ->getChild('Migrations')
-            ->getChildren()[0];
+        $file = $dir->getChildren()[0];
         $contents = $file->getContent();
 
         $this->assertStringContainsString('create_foo_table', $file->getName());
@@ -206,13 +179,11 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--markdown' => 'foobar'
         ]);
 
-        $path = 'FooBar/Notifications/FooBarNotification.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Notifications/FooBarNotification.php');
 
-        $this->assertCommandPath('FooBar/Views/foobar.blade.php');
+        $this->assertCommandPath('Views/foobar.blade.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Notifications;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Notifications;', $contents);
         $this->assertStringContainsString('class FooBarNotification', $contents);
         $this->assertStringContainsString('markdown(\'foobar', $contents);
     }
@@ -225,12 +196,10 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--model' => 'Foo'
         ]);
 
-        $path = 'FooBar/Observers/FooBarObserver.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Observers/FooBarObserver.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Observers;', $contents);
-        $this->assertStringContainsString('use App\\FooBar\\Models\\Foo', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Observers;', $contents);
+        $this->assertStringContainsString('use VFS\\FooBar\\Models\\Foo', $contents);
         $this->assertStringContainsString('class FooBarObserver', $contents);
         $this->assertStringContainsString('Foo $foo', $contents);
     }
@@ -243,12 +212,10 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--model' => 'Foo'
         ]);
 
-        $path = 'FooBar/Policies/FooBarPolicy.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Policies/FooBarPolicy.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Policies;', $contents);
-        $this->assertStringContainsString('use App\\FooBar\\Models\\Foo', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Policies;', $contents);
+        $this->assertStringContainsString('use VFS\\FooBar\\Models\\Foo', $contents);
         $this->assertStringContainsString('use App\\Users\\User', $contents);
         $this->assertStringContainsString('class FooBarPolicy', $contents);
         $this->assertStringContainsString('User $user, Foo $foo', $contents);
@@ -261,11 +228,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarProvider'
         ]);
 
-        $path = 'FooBar/Providers/FooBarProvider.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Providers/FooBarProvider.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Providers;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Providers;', $contents);
         $this->assertStringContainsString('class FooBarProvider', $contents);
     }
 
@@ -276,11 +241,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarRequest'
         ]);
 
-        $path = 'FooBar/Http/Requests/FooBarRequest.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Http/Requests/FooBarRequest.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Http\\Requests;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Http\\Requests;', $contents);
         $this->assertStringContainsString('class FooBarRequest', $contents);
     }
 
@@ -291,11 +254,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarResource'
         ]);
 
-        $path = 'FooBar/Http/Resources/FooBarResource.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Http/Resources/FooBarResource.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Http\\Resources;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Http\\Resources;', $contents);
         $this->assertStringContainsString('class FooBarResource ', $contents);
 
         $this->artisan('make:resource', [
@@ -304,11 +265,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--collection' => true
         ]);
 
-        $path = 'FooBar/Http/Resources/FooBarCollection.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Http/Resources/FooBarCollection.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Http\\Resources;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Http\\Resources;', $contents);
         $this->assertStringContainsString('class FooBarCollection ', $contents);
     }
 
@@ -319,11 +278,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarRule'
         ]);
 
-        $path = 'FooBar/Rules/FooBarRule.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Rules/FooBarRule.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Rules;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Rules;', $contents);
         $this->assertStringContainsString('class FooBarRule', $contents);
     }
 
@@ -334,11 +291,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarSeeder'
         ]);
 
-        $path = 'FooBar/Database/Seeds/FooBarSeeder.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Database/Seeds/FooBarSeeder.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Database\\Seeds;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Database\\Seeds;', $contents);
         $this->assertStringContainsString('class FooBarSeeder ', $contents);
     }
 
@@ -349,11 +304,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             'name' => 'FooBarTest'
         ]);
 
-        $path = 'FooBar/Tests/Feature/FooBarTest.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Tests/Feature/FooBarTest.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Tests\\Feature;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Tests\\Feature;', $contents);
         $this->assertStringContainsString('use Base\\Tests\\TestCase;', $contents);
         $this->assertStringContainsString('class FooBarTest', $contents);
     }
@@ -366,11 +319,9 @@ class ConsoleCommandsTest extends CommandsTestCase
             '--unit' => true
         ]);
 
-        $path = 'FooBar/Tests/Unit/FooBarTest.php';
-        $this->assertCommandPath($path);
-        $contents = $this->root->getChild($path)->getContent();
+        $contents = $this->assertCommandPath('Tests/Unit/FooBarTest.php');
 
-        $this->assertStringContainsString('namespace App\\FooBar\\Tests\\Unit;', $contents);
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Tests\\Unit;', $contents);
         $this->assertStringContainsString('use Base\\Tests\\TestCase;', $contents);
         $this->assertStringContainsString('class FooBarTest', $contents);
     }
