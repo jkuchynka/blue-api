@@ -3,6 +3,7 @@
 namespace Base\Tests\Unit;
 
 use Adbar\Dot;
+use Base\Exceptions\ModuleNotFoundException;
 use Illuminate\Config\Repository;
 use Symfony\Component\Yaml\Yaml;
 use org\bovigo\vfs\vfsStream;
@@ -45,6 +46,13 @@ class ModulesServiceTest extends \Base\Tests\TestCase
             $modulesService = new ModulesService($repo);
             $this->assertEquals($option[1], $modulesService->getModulesPath());
         }
+    }
+
+    public function test_get_non_existent_module_throws_exception()
+    {
+        $this->expectException(ModuleNotFoundException::class);
+        $modulesService = new ModulesService;
+        $modulesService->getModule('baz_qux');
     }
 
     public function test_load_modules()

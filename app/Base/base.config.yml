@@ -5,6 +5,4 @@ paths:
   migrations: Database
 routes:
   # API base route GET /
-  -
-    uri: /
-    uses: baseApi
+  - { uri: /, uses: baseApi }

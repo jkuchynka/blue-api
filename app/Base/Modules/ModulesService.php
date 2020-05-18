@@ -2,6 +2,7 @@
 
 namespace Base\Modules;
 
+use Base\Exceptions\ModuleNotFoundException;
 use Illuminate\Config\Repository;
 use Illuminate\Support\Str;
 use Symfony\Component\Yaml\Yaml;
@@ -142,14 +143,17 @@ class ModulesService
     }
 
     /**
-     * Get a module
+     * Get a loaded module by key
      *
      * @param  string $key
      * @return Dot
      */
     public function getModule($key): Module
     {
-        return $this->modules[$key];
+        if (isset($this->modules[$key])) {
+            return $this->modules[$key];
+        }
+        throw new ModuleNotFoundException('Module: '.$key.' not found or loaded.');
     }
 
     /**
