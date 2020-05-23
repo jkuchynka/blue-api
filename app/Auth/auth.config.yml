@@ -5,25 +5,16 @@ dependsOn:
   - users
 paths:
   controllers:
+  requests: Requests
 routes:
-  -
-    uri: login
-    method: post
-  -
-    uri: logout
-  -
-    uri: register
-    method: post
-  -
-    uri: request-reset
-    method: post
-  -
-    uri: reset
-    method: post
-  -
-    uri: validate-verify
-    method: post
-  -
-    uri: verify
-    method: post
-
+  - { uri: login, method: post }
+  - { uri: logout }
+  - { uri: register, method: post }
+  - { uri: send-reset-password, method: post }
+  - { uri: reset-password, method: put }
+  - { uri: validate-verify, method: post }
+  - { uri: verify, method: post }
+  - { uri: status }
+verify_expiration:
+  registration: 1 day
+  reset_password: 3 hours

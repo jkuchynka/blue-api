@@ -2,52 +2,65 @@
 
 namespace App\Auth;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Spatie\UrlSigner\MD5UrlSigner;
-use JWTAuth;
+use App\Auth\Mail\ResetPassword;
+use App\Auth\Mail\VerifyEmail;
+use App\Auth\Requests\LoginRequest;
+use App\Auth\Requests\RegisterRequest;
+use App\Auth\Requests\ResetPasswordRequest;
+use App\Auth\Requests\SendResetPasswordRequest;
+use App\Auth\Requests\ValidateVerifyRequest;
+use App\Users\User;
 use Auth;
 use Base\Http\Controller;
-use App\Users\User;
-use App\Mail\Auth\Verify;
+use JWTAuth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    /**
+     * User login attempt, generates JWT token
+     *
+     * @param  LoginRequest $request
+     * @return Response
+     */
+    public function login(LoginRequest $request)
     {
-        $input = $request->only('email', 'password');
-        if ( ! $token = JWTAuth::attempt($input)) {
+        $validated = $request->validated();
+
+        if ( ! $token = JWTAuth::attempt([
+            'email' => $validated['email'],
+            'password' => $validated['password']
+        ])) {
             return response()->json([
-                'success' => false,
                 'message' => 'Invalid credentials'
             ], 401);
         }
+
         $user = Auth::user();
+
         return response()->json([
-            'success' => true,
             'user' => $user,
             'token' => $token
         ]);
     }
 
+    /**
+     * User logout, invalidates JWT token
+     *
+     * @return Response
+     */
     public function logout()
     {
-        try {
-            auth()->invalidate();
-            return response()->json([
-                'success' => true,
-                'message' => 'Logged out'
-            ]);
-        } catch (JWTException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error logging out',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        // dd(auth()->user());
+        auth()->invalidate();
+
+        return response()->json([
+            'status' => 'OK',
+            'message' => 'Logged out'
+        ], 201);
     }
 
     /**
@@ -57,123 +70,107 @@ class AuthController extends Controller
      * Send verify email
      * Verify validates user account and captures new password and name
      * User can then login with password
+     *
+     * @param  RegisterRequest $request
+     * @return Response
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email|unique:users'
-        ]);
+        $validated = $request->validated();
+
         $user = User::create([
-            'email' => $request->email,
-            'password' => bcrypt(Str::random(10))
+            'email' => $validated['email'],
+            'password' => Hash::make(Str::random(10))
         ]);
-        // $user->save();
+
         Mail::to([
             ['email' => $user->email]
-        ])->send(new Verify($user));
-        return response()->json($user);
+        ])->send(new VerifyEmail($user));
+
+        return response()->json([
+            'status' => 'OK',
+            'message' => 'User registered'
+        ], 201);
     }
 
     /**
-     * Send reset password link to user's email
+     * Send reset password email to user
+     *
+     * @param  SendResetPasswordRequest $request
+     * @return Response
      */
-    public function requestReset(Request $request)
+    public function sendResetPassword(SendResetPasswordRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email'
-        ]);
-        $user = User::where('email', $request->email)->firstOrFail();
-        $verify = new Verify($user);
-        $verify->setType('reset');
+        $validated = $request->validated();
+
+        $user = User::where('email', $validated['email'])->firstOrFail();
+
         Mail::to([
             ['email' => $user->email]
-        ])->send($verify);
+        ])->send(new ResetPassword($user));
+
         return response()->json([
-            'success' => true
-        ]);
+            'status' => 'OK',
+            'message' => 'Reset password sent'
+        ], 201);
     }
 
     /**
-     * Reset user's password
+     * Reset user's password.
+     * This can be used by either the register email verification,
+     * or the reset password email.
+     *
+     * @param  ResetPasswordRequest $request
+     * @return Response
      */
-    public function reset(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'password' => 'required|min:6',
-            'password_confirm' => 'required|same:password',
-            'url' => 'required'
-        ]);
-        $valid = $this->validateUrl($request->url);
-        $user = $this->getUserFromSignedUrl($request->url);
-        if ($valid && $user) {
-            $user->password = bcrypt($request->password);
+        $data = $request->validated();
+        $user = $data['user'];
+
+        $user->password = Hash::make($data['password']);
+
+        $emailVerified = false;
+        if (! $user->email_verified_at) {
             $user->markEmailAsVerified();
-            return response()->json([
-                'message' => 'User email verified and password set.'
-            ]);
+            $emailVerified = true;
         }
+
+        $user->save();
+
         return response()->json([
-            'message' => 'Invalid URL'
-        ], 422);
+            'status' => 'OK',
+            'message' => $emailVerified ? 'User email verified and password set.' : 'User password set.'
+        ], 201);
     }
 
     /**
-     * Validates a verify signed url, used for validating
-     * new users and reset passwords
+     * Validates a verify signed url
+     *
+     * @param  ValidateVerifyRequest $request
+     * @return Response
      */
-    public function validVerify(Request $request)
+    public function validateVerify(ValidateVerifyRequest $request)
     {
-        $request->validate([
-            'url' => 'required'
-        ]);
-        $valid = $this->validateUrl($request->url);
-        $user = $this->getUserFromSignedUrl($request->url);
-        if ($valid && $user) {
-            return response()->json([
-                'message' => 'URL is valid.'
-            ]);
-        }
+        $validated = $request->validated();
+
         return response()->json([
-            'message' => 'Invalid URL'
-        ], 422);
+            'status' => 'OK',
+            'message' => 'URL is valid'
+        ], 201);
     }
 
     /**
-     * Verifies email and sets user's password.
-     * Can only set password if email hasn't been verified yet.
+     * Returns the current user logged in or not status
+     *
+     * @return Response
      */
-    public function verify(Request $request)
+    public function status()
     {
-        $request->validate([
-            'password' => 'required|min:6',
-            'password_confirm' => 'required|same:password',
-            'url' => 'required'
+        $user = auth()->user();
+
+        return $user ? response()->json($user) : response()->json([
+            'id' => null
         ]);
-        $valid = $this->validateUrl($request->url);
-        $user = $this->getUserFromSignedUrl($request->url);
-        if ($valid && $user) {
-            $user->password = bcrypt($request->password);
-            $user->markEmailAsVerified();
-            return response()->json([
-                'message' => 'User email verified and password set.'
-            ]);
-        }
-        return response()->json([
-            'message' => 'Invalid URL'
-        ], 422);
-    }
-
-    protected function getUserFromSignedUrl($url)
-    {
-        $parts = explode('/', explode('?', $url)[0]);
-        $userId = array_pop($parts);
-        $user = User::find($userId);
-        return $user;
-    }
-
-    protected function validateUrl($url)
-    {
-        $signer = new MD5UrlSigner(Config::get('app.url_sign_secret'));
-        return $signer->validate($url);
     }
 }

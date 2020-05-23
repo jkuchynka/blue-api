@@ -13,8 +13,4 @@ paths:
   console:
     commands: Commands
 routes:
-  -
-    uri: /users
-    method: resource
-    model: User
-    controller: UsersController
+  - { uri: /users, method: resource, model: User, controller: UsersController }
