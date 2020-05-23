@@ -4,6 +4,7 @@ namespace Base\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Config\Repository;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
@@ -53,6 +54,7 @@ class ModulesServiceProvider extends ServiceProvider
         $modulesService = $this->app->make('modules');
         $factory = $this->app->make(EloquentFactory::class);
         $migrator = $this->app->make('migrator');
+        $viewFactory = $this->app->make(ViewFactory::class);
 
         $modules = $modulesService->getModules();
         foreach ($modules as $module) {
@@ -67,6 +69,11 @@ class ModulesServiceProvider extends ServiceProvider
 
             // Register module migration paths
             $migrator->path($module->path('migrations'));
+
+            // Register module view paths. Instead of actual namespace (App\Auth),
+            // this should be the name of the module, or trailing part of
+            // namespace (Auth)
+            $viewFactory->addNamespace($module['name'], $module->path('views'));
         }
     }
 }

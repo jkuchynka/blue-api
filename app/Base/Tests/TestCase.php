@@ -2,16 +2,17 @@
 
 namespace Base\Tests;
 
-use Illuminate\Container\Container;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Support\Str;
 use Base\Http\Controller;
 use Base\Modules\ModulesService;
 use Base\Providers\ModuleServiceProvider;
+use JMac\Testing\Traits\AdditionalAssertions;
+use Illuminate\Container\Container;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Str;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication;
+    use CreatesApplication, AdditionalAssertions;
 
     protected $loadModules = [];
 

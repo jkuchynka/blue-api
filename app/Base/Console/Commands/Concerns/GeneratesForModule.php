@@ -149,6 +149,7 @@ trait GeneratesForModule
      */
     protected function getPath($name)
     {
+        $name = str_replace('.php', '', $name);
         // Allow for handling namespaced class, module path or relative path
         $pathed = str_replace('\\', '/', $name);
 
