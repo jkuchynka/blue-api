@@ -1,6 +1,6 @@
 name: Auth
 description: Handles authorization and JWT tokens
-version: 0.1
+version: 0.2
 dependsOn:
   - users
 paths:
