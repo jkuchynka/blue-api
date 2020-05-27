@@ -3,8 +3,8 @@
 namespace App\Users\Tests\Feature;
 
 use App\Users\User;
-use App\Users\UsersController;
-use App\Users\UsersQuery;
+use App\Users\Http\Controllers\UserController;
+use App\Users\Http\Queries\UserQuery;
 use Base\Tests\TestCase;
 use Base\Tests\Traits\TestsApi;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,7 +48,7 @@ class UsersApiTest extends TestCase
      */
     protected function controller()
     {
-        return UsersController::class;
+        return UserController::class;
     }
 
     /**
@@ -64,11 +64,11 @@ class UsersApiTest extends TestCase
     /**
      * Return the query builder under test
      *
-     * @return UsersQuery
+     * @return UserQuery
      */
     protected function queryBuilder()
     {
-        return UsersQuery::for(User::class);
+        return UserQuery::for(User::class);
     }
 
     /**

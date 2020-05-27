@@ -5,13 +5,5 @@ dependsOn:
   - auth
 seeds: true
 seedsWeight: 0
-paths:
-  controllers:
-  factories: Database
-  migrations: Database
-  requests: Requests
-  seeds: Database
-  console:
-    commands: Commands
 routes:
-  - { uri: /users, method: resource, model: User, controller: UsersController }
+  - { uri: /users, method: resource, model: User, uses: UserController }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Users;
+namespace App\Users\Http\Queries;
 
 use Base\Http\QueryBuilder;
 
-class UsersQuery extends QueryBuilder
+class UserQuery extends QueryBuilder
 {
     /**
      * Get allowed filters

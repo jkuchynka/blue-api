@@ -2,20 +2,20 @@
 
 namespace App\Users\Tests\Unit;
 
-use App\Users\Requests\UserUpdateRequest;
-use App\Users\Requests\UserStoreRequest;
-use App\Users\UsersController;
+use App\Users\Http\Requests\UserUpdateRequest;
+use App\Users\Http\Requests\UserStoreRequest;
+use App\Users\Http\Controllers\UserController;
 use Base\Tests\TestCase;
 
 /**
- * Unit test for UsersController
+ * Unit test for UserController
  */
-class UsersControllerTest extends TestCase
+class UserControllerTest extends TestCase
 {
     public function test_store_validates_using_form_request()
     {
         $this->assertActionUsesFormRequest(
-            UsersController::class,
+            UserController::class,
             'store',
             UserStoreRequest::class
         );
@@ -24,7 +24,7 @@ class UsersControllerTest extends TestCase
     public function test_update_validates_using_form_request()
     {
         $this->assertActionUsesFormRequest(
-            UsersController::class,
+            UserController::class,
             'update',
             UserUpdateRequest::class
         );

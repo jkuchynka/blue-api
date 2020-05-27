@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Users\Requests;
+namespace App\Users\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserUpdateRequest extends FormRequest
+class UserDestroyManyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     * @todo: If user has admin, allowed role or user_owned
      *
      * @return bool
      */
     public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -25,8 +24,7 @@ class UserUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email',
-            'name' => 'required'
+            'ids' => 'required|array'
         ];
     }
 }

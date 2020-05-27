@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Users;
+namespace App\Users\Http\Controllers;
 
 use App\Auth\Mail\VerifyEmail;
+use App\Users\Http\Queries\UserQuery;
+use App\Users\Http\Requests\UserDestroyManyRequest;
+use App\Users\Http\Requests\UserStoreRequest;
+use App\Users\Http\Requests\UserUpdateRequest;
+use App\Users\User;
 use Base\Http\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use App\Users\Requests\UserStoreRequest;
-use App\Users\Requests\UserUpdateRequest;
-use App\Users\Requests\UserDestroyManyRequest;
 
-class UsersController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,7 +22,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        return UsersQuery::for(User::class)->jsonPaginate();
+        return UserQuery::for(User::class)->jsonPaginate();
     }
 
     /**
