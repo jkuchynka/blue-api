@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
  * Only allows for string filters and does a simple fuzzy "contain" search
  * for each column.
  */
-class FiltersAll implements Filter
+class FuzzyFilter implements Filter
 {
     protected $fields = [];
 

@@ -2,6 +2,8 @@
 
 namespace App\Users\Tests\Unit;
 
+use App\Auth\AuthController;
+use App\Auth\Requests\LoginRequest;
 use Base\Tests\TestCase;
 use Base\Tests\Traits\ProvidesController;
 use App\Users\UsersController;
@@ -65,22 +67,22 @@ class UsersTest extends TestCase
         ];
     }
 
-    /**
-     * Test that the controller provides and matches the
-     * correct validation rules for store method.
-     */
-    public function test_controller_has_store_rules()
+    public function test_store_validates_using_a_form_request()
     {
-        $this->assertControllerHasStoreRules($this->rules(), $this->getController());
+        $this->assertActionUsesFormRequest(
+            UserController::class,
+            'store',
+            UserStoreRequest::class
+        );
     }
 
-    /**
-     * Test that the controller provides and matches the
-     * correct validation rules for update method.
-     */
-    public function test_controller_has_update_rules()
+    public function test_update_validates_using_a_form_request()
     {
-        $this->assertControllerHasUpdateRules($this->rules(true), $this->getController());
+        $this->assertActionUsesFormRequest(
+            UserController::class,
+            'update',
+            UserUpdateRequest::class
+        );
     }
 
     /**
