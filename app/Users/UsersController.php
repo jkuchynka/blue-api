@@ -2,136 +2,86 @@
 
 namespace App\Users;
 
-use App\Users\User;
-use Illuminate\Http\Request;
+use App\Auth\Mail\VerifyEmail;
+use Base\Http\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
-use Base\Http\Filters\FiltersAll;
-use App\Auth\Mail\Verify;
+use App\Users\Requests\UserStoreRequest;
+use App\Users\Requests\UserUpdateRequest;
+use App\Users\Requests\UserDestroyManyRequest;
 
-class UsersController extends \Base\Http\Controller
+class UsersController extends Controller
 {
-    /**
-     * Get validation rules
-     *
-     * @param  bool $update For use in update method
-     * @return array
-     */
-    public function rules(bool $update = false)
-    {
-        return [
-            'email' => 'required|email',
-            'name' => 'required'
-        ];
-    }
-
-    /**
-     * Get allowed filters for index query
-     *
-     * @return array
-     */
-    public function filters()
-    {
-        return [
-            'id',
-            'name',
-            'email'
-        ];
-    }
-
-    /**
-     * Get allowed sorts for index query
-     *
-     * @return array
-     */
-    public function sorts()
-    {
-        return [
-            'id',
-            'name',
-            'email'
-        ];
-    }
-
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function index()
     {
-        $filters = $this->filters();
-        $filters[] = AllowedFilter::custom('all', new FiltersAll($this->filters()));
-        $results = QueryBuilder::for(User::class)
-            ->allowedFilters($filters)
-            ->allowedSorts($this->sorts())
-            ->jsonPaginate();
-        return $results;
+        return UsersQuery::for(User::class)->jsonPaginate();
     }
 
     /**
-     * Create a new user, emailing them a verification email.
-     * Upon verification, they can set their password and login.
+     * Create a new user outside of registration process,
+     * such as by an admin.
+     * Sends user a verification email.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param UserStoreRequest $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
-        $request->validate($this->rules());
-        $record = new User;
-        $record->fill($request->all());
+        $data = $request->validated();
+
+        $user = new User;
+        $user->fill($data);
 
         // Create a random password.
-        $record->password = bcrypt(Str::random(10));
-        $record->save();
+        $user->password = bcrypt(Str::random(10));
+        $user->save();
 
         Mail::to([
-            ['email' => $record->email, 'name' => $record->name]
-        ])->send(new Verify($record));
-        return response()->json($record);
+            ['email' => $user->email, 'name' => $user->name]
+        ])->send(new VerifyEmail($user));
+
+        return response()->json($user);
     }
 
     /**
      * Return a user
      *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
+     * @param User $user
+     * @return JsonResponse
      */
     public function show(User $user)
     {
-        $record = $user;
-        return $record;
+        return response()->json($user);
     }
 
     /**
      * Update a user
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
+     * @param UserUpdateRequest $request
+     * @param User $user
+     * @return JsonResponse
      */
-    public function update(Request $request, User $user)
+    public function update(UserUpdateRequest $request, User $user)
     {
-        $request->validate($this->rules(true));
-        $record = $user;
-        $record->fill($request->all());
-        $record->save();
-        return response()->json($record);
+        $user->update($request->validated());
+        return response()->json($user);
     }
 
     /**
      * Delete a user
      *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
+     * @param User $user
+     * @return JsonResponse
      */
     public function destroy(User $user)
     {
-        $record = $user;
-        $record->delete();
+        $user->delete();
         return response()->json([
             'success' => true,
             'message' => 'User deleted.'
@@ -141,17 +91,15 @@ class UsersController extends \Base\Http\Controller
     /**
      * Delete users
      *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
+     * @param UserDestroyManyRequest $request
+     * @return JsonResponse
      */
-    public function destroyMany(Request $request)
+    public function destroyMany(UserDestroyManyRequest $request)
     {
-        $this->validate($request, [
-            'ids' => 'required|array'
-        ]);
-        foreach ($request->ids as $id) {
-            $record = User::findOrFail($id);
-            $record->delete();
+        $data = $request->validated();
+        foreach ($data->ids as $id) {
+            $user = User::findOrFail($id);
+            $user->delete();
         }
         return response()->json([
             'success' => true,

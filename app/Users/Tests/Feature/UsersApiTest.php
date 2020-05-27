@@ -2,13 +2,12 @@
 
 namespace App\Users\Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Base\Tests\TestCase;
-use Base\Tests\Traits\ProvidesController;
-use Base\Tests\Traits\ProvidesModel;
-use App\Users\UsersController;
 use App\Users\User;
+use App\Users\UsersController;
+use App\Users\UsersQuery;
+use Base\Tests\TestCase;
+use Base\Tests\Traits\TestsApi;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
  * API feature resource test
@@ -16,8 +15,7 @@ use App\Users\User;
 class UsersApiTest extends TestCase
 {
     use RefreshDatabase,
-        ProvidesController,
-        ProvidesModel;
+        TestsApi;
 
     /**
      * Ensure this test only loads these modules and their
@@ -46,7 +44,7 @@ class UsersApiTest extends TestCase
     /**
      * Return the controller under test
      *
-     * @return string|Base\Http\Controller
+     * @return string
      */
     protected function controller()
     {
@@ -56,7 +54,7 @@ class UsersApiTest extends TestCase
     /**
      * Return the model under test
      *
-     * @return Model
+     * @return string
      */
     protected function model()
     {
@@ -64,13 +62,21 @@ class UsersApiTest extends TestCase
     }
 
     /**
+     * Return the query builder under test
+     *
+     * @return UsersQuery
+     */
+    protected function queryBuilder()
+    {
+        return UsersQuery::for(User::class);
+    }
+
+    /**
      * Test the basic index api
      */
     public function test_index()
     {
-        $route = 'users.index';
-
-        $this->assertApiIndex($route, $this->getModel(), $this->responseFields());
+        $this->assertApiIndex('users.index');
     }
 
     /**
@@ -78,9 +84,7 @@ class UsersApiTest extends TestCase
      */
     public function test_index_filters_fields()
     {
-        $route = 'users.index';
-
-        $this->assertApiIndexFilters($route, $this->getModel(), $this->getController());
+        $this->assertApiIndexFilters('users.index');
     }
 
     /**
@@ -88,9 +92,7 @@ class UsersApiTest extends TestCase
      */
     public function test_index_searches_fields()
     {
-        $route = 'users.index';
-
-        $this->assertApiIndexSearches($route, $this->getModel(), $this->getController());
+        $this->assertApiIndexSearches('users.index');
     }
 
     /**
@@ -98,9 +100,7 @@ class UsersApiTest extends TestCase
      */
     public function test_index_sorts_by_fields()
     {
-        $route = 'users.index';
-
-        $this->assertApiIndexSorts($route, $this->getModel(), $this->getController());
+        $this->assertApiIndexSorts('users.index');
     }
 
     /**
@@ -108,21 +108,7 @@ class UsersApiTest extends TestCase
      */
     public function test_index_paginates_fields()
     {
-        $route = 'users.index';
-
-        $this->assertApiIndexPaginates($route, $this->getModel(), $this->getController());
-    }
-
-    /**
-     * Test that the store api returns a validation
-     * errors response with an invalid field.
-     */
-    public function test_store_validates()
-    {
-        $route = 'users.store';
-        $invalidField = 'email';
-
-        $this->assertApiStoreValidates($route, $invalidField, $this->getModel());
+        $this->assertApiIndexPaginates('users.index');
     }
 
     /**
@@ -130,9 +116,7 @@ class UsersApiTest extends TestCase
      */
     public function test_store_success()
     {
-        $route = 'users.store';
-
-        $this->assertApiStoreSuccess($route, $this->getModel(), $this->responseFields());
+        $this->assertApiStoreSuccess('users.store');
     }
 
     /**
@@ -140,9 +124,7 @@ class UsersApiTest extends TestCase
      */
     public function test_show()
     {
-        $route = 'users.show';
-
-        $this->assertApiShow($route, $this->getModel(), $this->responseFields());
+        $this->assertApiShow('users.show');
     }
 
     /**
@@ -150,22 +132,7 @@ class UsersApiTest extends TestCase
      */
     public function test_show_returns_404()
     {
-        $route = 'users.show';
-
-        $this->assertApiShow404($route, $this->getModel());
-    }
-
-    /**
-     * Test that the update api returns a validation
-     * errors response with an invalid field.
-     */
-    public function test_update_validates()
-    {
-        $route = 'users.update';
-        $field = 'name';
-        $value = '';
-
-        $this->assertApiUpdateValidates($route, $this->getModel(), $field, $value);
+        $this->assertApiShow404('users.show');
     }
 
     /**
@@ -173,11 +140,7 @@ class UsersApiTest extends TestCase
      */
     public function test_update_success()
     {
-        $route = 'users.update';
-        $field = 'email';
-        $value = 'foobar@mail.net';
-
-        $this->assertApiUpdateSuccess($route, $this->getModel(), $field, $value);
+        $this->assertApiUpdateSuccess('users.update', 'email', 'foobar@mail.net');
     }
 
     /**
@@ -185,9 +148,6 @@ class UsersApiTest extends TestCase
      */
     public function test_delete_success()
     {
-        $route = 'users.destroy';
-        $softDeletes = true;
-
-        $this->assertApiDestroySuccess($route, $this->getModel(), $softDeletes);
+        $this->assertApiDestroySuccess('users.destroy', true);
     }
 }

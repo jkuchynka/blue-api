@@ -1,6 +1,6 @@
 name: Users
 description: Users module
-version: 0.1
+version: 0.2
 dependsOn:
   - auth
 seeds: true
@@ -9,6 +9,7 @@ paths:
   controllers:
   factories: Database
   migrations: Database
+  requests: Requests
   seeds: Database
   console:
     commands: Commands
