@@ -40,6 +40,7 @@ class Module extends Dot
                 'observers' => 'Observers',
                 'policies' => 'Policies',
                 'providers' => 'Providers',
+                'queries' => 'Http/Queries',
                 'requests' => 'Http/Requests',
                 'resources' => 'Http/Resources',
                 'rules' => 'Rules',

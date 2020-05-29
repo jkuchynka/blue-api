@@ -234,6 +234,19 @@ class ConsoleCommandsTest extends CommandsTestCase
         $this->assertStringContainsString('class FooBarProvider', $contents);
     }
 
+    public function test_query_make_command()
+    {
+        $this->artisan('make:query', [
+            'module' => 'foo_bar',
+            'name' => 'FooBarQuery'
+        ]);
+
+        $contents = $this->assertCommandPath('Http/Queries/FooBarQuery.php');
+
+        $this->assertStringContainsString('namespace VFS\\FooBar\\Http\\Queries;', $contents);
+        $this->assertStringContainsString('class FooBarQuery', $contents);
+    }
+
     public function test_request_make_command()
     {
         $this->artisan('make:request', [
