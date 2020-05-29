@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
 use Spatie\UrlSigner\MD5UrlSigner;
 
-class Verify extends Mailable
+abstract class Verify extends Mailable
 {
     use Queueable, SerializesModels;
 

@@ -18,7 +18,7 @@ class VerifyEmail extends Verify
         $expiration = (new Datetime)->modify($auth['verify_expiration.registration']);
         $verifyUrl = $this->buildVerifyUrl('registration', $expiration);
 
-        return $this->view('registration')
+        return $this->view('Auth::registration')
             ->with([
                 'verifyUrl' => $verifyUrl,
                 'user' => $this->user
