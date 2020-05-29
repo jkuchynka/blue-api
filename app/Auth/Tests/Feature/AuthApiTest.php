@@ -4,7 +4,7 @@ namespace App\Auth\Tests\Feature;
 
 use App\Auth\Mail\ResetPassword;
 use App\Auth\Mail\VerifyEmail;
-use App\Users\User;
+use App\Users\Models\User;
 use Base\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;

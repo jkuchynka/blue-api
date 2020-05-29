@@ -2,7 +2,7 @@
 
 namespace App\Auth\Mail;
 
-use App\Users\User;
+use App\Users\Models\User;
 use Datetime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;

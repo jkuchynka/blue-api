@@ -1,5 +1,5 @@
-name: UserResource
-description: UserResource module
+name: Users
+description: Users module
 version: 0.2
 dependsOn:
   - auth

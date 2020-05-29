@@ -4,6 +4,8 @@ namespace Base\Tests\Feature\Console;
 
 class ConsoleCommandsTest extends CommandsTestCase
 {
+    protected $namespacedUser = 'use App\\Users\\Models\\User;';
+
     public function test_channel_make_command()
     {
         $this->artisan('make:channel', [
@@ -14,7 +16,7 @@ class ConsoleCommandsTest extends CommandsTestCase
         $contents = $this->assertCommandPath('Broadcasting/FooBarChannel.php');
 
         $this->assertStringContainsString('namespace VFS\\FooBar\\Broadcasting;', $contents);
-        $this->assertStringContainsString('use App\\Users\\User;', $contents);
+        $this->assertStringContainsString($this->namespacedUser, $contents);
         $this->assertStringContainsString('class FooBarChannel', $contents);
         $this->assertStringContainsString('User $user', $contents);
     }
@@ -216,7 +218,7 @@ class ConsoleCommandsTest extends CommandsTestCase
 
         $this->assertStringContainsString('namespace VFS\\FooBar\\Policies;', $contents);
         $this->assertStringContainsString('use VFS\\FooBar\\Models\\Foo', $contents);
-        $this->assertStringContainsString('use App\\Users\\User', $contents);
+        $this->assertStringContainsString($this->namespacedUser, $contents);
         $this->assertStringContainsString('class FooBarPolicy', $contents);
         $this->assertStringContainsString('User $user, Foo $foo', $contents);
     }

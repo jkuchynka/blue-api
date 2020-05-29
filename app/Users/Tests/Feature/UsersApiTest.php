@@ -2,7 +2,7 @@
 
 namespace App\Users\Tests\Feature;
 
-use App\Users\User;
+use App\Users\Models\User;
 use App\Users\Http\Controllers\UserController;
 use App\Users\Http\Queries\UserQuery;
 use Base\Tests\TestCase;

@@ -2,7 +2,7 @@
 
 namespace Base\Rules;
 
-use App\Users\User;
+use App\Users\Models\User;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Config;
 use Spatie\UrlSigner\MD5UrlSigner;

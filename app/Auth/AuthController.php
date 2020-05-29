@@ -9,7 +9,7 @@ use App\Auth\Requests\RegisterRequest;
 use App\Auth\Requests\ResetPasswordRequest;
 use App\Auth\Requests\SendResetPasswordRequest;
 use App\Auth\Requests\ValidateVerifyRequest;
-use App\Users\User;
+use App\Users\Models\User;
 use Auth;
 use Base\Http\Controller;
 use JWTAuth;

@@ -3,7 +3,7 @@
 namespace App\Users\Tests\Unit;
 
 use App\Users\Http\Queries\UserQuery;
-use App\Users\User;
+use App\Users\Models\User;
 use Base\Tests\TestCase;
 
 class UserQueryTest extends TestCase

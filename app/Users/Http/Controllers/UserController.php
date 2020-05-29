@@ -9,7 +9,7 @@ use App\Users\Http\Requests\UserStoreRequest;
 use App\Users\Http\Requests\UserUpdateRequest;
 use App\Users\Http\Resources\UserResource;
 use App\Users\Http\Resources\UserCollection;
-use App\Users\User;
+use App\Users\Models\User;
 use Base\Http\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
