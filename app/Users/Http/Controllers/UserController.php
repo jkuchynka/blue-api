@@ -7,6 +7,8 @@ use App\Users\Http\Queries\UserQuery;
 use App\Users\Http\Requests\UserDestroyManyRequest;
 use App\Users\Http\Requests\UserStoreRequest;
 use App\Users\Http\Requests\UserUpdateRequest;
+use App\Users\Http\Resources\UserResource;
+use App\Users\Http\Resources\UserCollection;
 use App\Users\User;
 use Base\Http\Controller;
 use Illuminate\Http\JsonResponse;
@@ -18,11 +20,13 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return JsonResponse
+     * @return UserCollection
      */
     public function index()
     {
-        return UserQuery::for(User::class)->jsonPaginate();
+        return new UserCollection(
+            UserQuery::for(User::class)->jsonPaginate()
+        );
     }
 
     /**
@@ -31,7 +35,7 @@ class UserController extends Controller
      * Sends user a verification email.
      *
      * @param UserStoreRequest $request
-     * @return JsonResponse
+     * @return UserResource
      */
     public function store(UserStoreRequest $request)
     {
@@ -48,18 +52,18 @@ class UserController extends Controller
             ['email' => $user->email, 'name' => $user->name]
         ])->send(new VerifyEmail($user));
 
-        return response()->json($user);
+        return new UserResource($user);
     }
 
     /**
      * Return a user
      *
      * @param User $user
-     * @return JsonResponse
+     * @return UserResource
      */
     public function show(User $user)
     {
-        return response()->json($user);
+        return new UserResource($user);
     }
 
     /**
@@ -67,12 +71,12 @@ class UserController extends Controller
      *
      * @param UserUpdateRequest $request
      * @param User $user
-     * @return JsonResponse
+     * @return UserResource
      */
     public function update(UserUpdateRequest $request, User $user)
     {
         $user->update($request->validated());
-        return response()->json($user);
+        return new UserResource($user);
     }
 
     /**
@@ -87,7 +91,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'User deleted.'
-        ]);
+        ], 204);
     }
 
     /**
@@ -105,7 +109,7 @@ class UserController extends Controller
         }
         return response()->json([
             'success' => true,
-            'message' => 'Users deleted.'
-        ]);
+            'message' => 'UserResource deleted.'
+        ], 204);
     }
 }

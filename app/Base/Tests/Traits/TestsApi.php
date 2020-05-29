@@ -65,12 +65,19 @@ trait TestsApi
         $response = $this->json('get', $route);
         $response
             ->assertStatus(200)
-            ->assertJsonPath('total', $num)
+            ->assertJsonPath('meta.total', $num)
             ->assertJsonStructure([
                 'data' => [
                     $responseFields
+                ],
+                'links' => [
+
+                ],
+                'meta' => [
+
                 ]
             ]);
+
         $this->assertCount($num, $response->json()['data']);
 
         return $this;
@@ -130,31 +137,6 @@ trait TestsApi
     }
 
     /**
-     * Assert that the store api returns a validation
-     * errors response with an invalid field.
-     *
-     * @param string $route
-     * @param string $field
-     * @param mixed $value
-     * @return $this
-     */
-    public function assertApiStoreValidates(string $route, string $field, $value = '')
-    {
-        $route = route($route);
-
-        $record = factory($this->model())->make([
-            $field => $value
-        ]);
-
-        $response = $this->json('post', $route, $record->toArray());
-        $response
-            ->assertStatus(422)
-            ->assertJsonValidationErrors([$field]);
-
-        return $this;
-    }
-
-    /**
      * Assert that the store api successfully creates record, and
      * returns the correct response
      *
@@ -168,8 +150,8 @@ trait TestsApi
         $record = factory($this->model())->make();
         $response = $this->json('post', $route, $record->toArray());
         $response
-            ->assertStatus(200)
-            ->assertJsonStructure($this->responseFields());
+            ->assertStatus(201)
+            ->assertJsonStructure(['data' => $this->responseFields()]);
 
         return $this;
     }
@@ -191,7 +173,7 @@ trait TestsApi
         $response = $this->json('get', $route);
         $response
             ->assertStatus(200)
-            ->assertJsonStructure($this->responseFields());
+            ->assertJsonStructure(['data' => $this->responseFields()]);
 
         return $this;
     }
@@ -211,34 +193,6 @@ trait TestsApi
         $response = $this->json('get', $route);
         $response
             ->assertStatus(404);
-
-        return $this;
-    }
-
-    /**
-     * Assert that the update api returns validation errors response
-     * with an invalid field
-     *
-     * @param  string $route
-     * @param  string $field
-     * @param  string $value
-     * @return $this
-     */
-    public function assertApiUpdateValidates(string $route, string $field, string $value)
-    {
-        $record = factory($this->model())->create();
-
-        $route = route($route, [
-            $this->routeParam() => $record->id
-        ]);
-
-        $params = $record->toArray();
-        $params[$field] = $value;
-
-        $response = $this->json('put', $route, $params);
-        $response
-            ->assertStatus(422)
-            ->assertJsonValidationErrors([$field]);
 
         return $this;
     }
@@ -265,7 +219,7 @@ trait TestsApi
         $response = $this->putJson($route, $params);
         $response
             ->assertStatus(200)
-            ->assertJsonPath($field, $value);
+            ->assertJsonPath('data.'.$field, $value);
 
         return $this;
     }
@@ -290,7 +244,7 @@ trait TestsApi
             ]
         ]);
         $response
-            ->assertStatus(200);
+            ->assertStatus(204);
 
         $this->assertEquals(0, ($this->model())::count());
 
