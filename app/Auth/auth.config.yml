@@ -1,6 +1,6 @@
 name: Auth
 description: Handles authentication, authorization and JWT tokens
-version: 0.3
+version: 0.4
 dependsOn:
   - users
 paths:
@@ -10,11 +10,12 @@ routes:
   - { uri: login, method: post }
   - { uri: logout }
   - { uri: register, method: post }
-  - { uri: send-reset-password, method: post }
+  - { uri: refresh, method: post }
   - { uri: reset-password, method: put }
+  - { uri: send-reset-password, method: post }
+  - { uri: status }
   - { uri: validate-verify, method: post }
   - { uri: verify, method: post }
-  - { uri: status }
 verify_expiration:
   registration: 1 day
   reset_password: 3 hours

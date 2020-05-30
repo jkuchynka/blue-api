@@ -72,6 +72,21 @@ class AuthApiTest extends TestCase
             ->assertJsonPath('data.id', null);
     }
 
+    public function test_refresh()
+    {
+        $user = factory(User::class)->create();
+        $token = auth()->tokenById($user->id);
+
+        $response = $this->postJson(route('auth.refresh'), [], [
+            'Authorization' => 'Bearer '.$token
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertNotEmpty($response->json()['meta']['token']);
+        $this->assertIsString($response->json()['meta']['token']);
+        $this->assertNotEquals($token, $response->json()['meta']['token']);
+    }
+
     public function test_register()
     {
         Mail::fake();
@@ -218,13 +233,10 @@ class AuthApiTest extends TestCase
             ],
             'meta' => [
                 'permissions',
-                'roles',
-                'token'
+                'roles'
             ]
         ]);
         $response->assertJsonPath('meta.roles', ['test-role']);
         $response->assertJsonPath('meta.permissions', ['test-permission']);
-        $this->assertNotEmpty($response->json()['meta']['token']);
-        $this->assertIsString($response->json()['meta']['token']);
     }
 }

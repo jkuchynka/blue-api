@@ -51,10 +51,10 @@ class AuthController extends Controller
      * Build a user resource
      *
      * @param Authenticatable $user
-     * @param string $token
+     * @param string|null $token
      * @return UserResource
      */
-    protected function userResource(Authenticatable $user, string $token)
+    protected function userResource(Authenticatable $user, $token)
     {
         $permissions = $user->allPermissions()->map(function ($permission) {
             return $permission->name;
@@ -62,14 +62,16 @@ class AuthController extends Controller
         $roles = $user->roles->map(function ($role) {
             return $role->name;
         });
-
+        $meta = [
+            'permissions' => $permissions,
+            'roles' => $roles
+        ];
+        if ($token) {
+            $meta['token'] = $token;
+        }
         return (new UserResource($user))
             ->additional([
-                'meta' => [
-                    'permissions' => $permissions,
-                    'roles' => $roles,
-                    'token' => $token
-                ]
+                'meta' => $meta
             ]);
     }
 
@@ -186,6 +188,17 @@ class AuthController extends Controller
     }
 
     /**
+     * Refresh JWT token
+     *
+     * @return UserResource
+     */
+    public function refresh()
+    {
+        $token = auth()->refresh();
+        return $this->userResource(auth()->user(), $token);
+    }
+
+    /**
      * Returns the current user logged in or not status
      *
      * @return UserResource|JsonResponse
@@ -193,9 +206,8 @@ class AuthController extends Controller
     public function status()
     {
         $user = auth()->user();
-        $token = $user ? auth()->tokenById($user->id) : null;
 
-        return $user ? $this->userResource($user, $token) : response()->json([
+        return $user ? $this->userResource($user, null) : response()->json([
             'data' => [
                 'id' => null
             ],
