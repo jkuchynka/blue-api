@@ -4,6 +4,8 @@ namespace App\Auth\Tests\Feature;
 
 use App\Auth\Mail\ResetPassword;
 use App\Auth\Mail\VerifyEmail;
+use App\Auth\Models\Role;
+use App\Auth\Models\Permission;
 use App\Users\Models\User;
 use Base\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,39 +21,52 @@ class AuthApiTest extends TestCase
     public function test_login()
     {
         $user = factory(User::class)->create();
+
+        $role = Role::create([
+            'name' => 'test-role'
+        ]);
+        $permission = Permission::create([
+            'name' => 'test-permission'
+        ]);
+        $role->attachPermission($permission);
+        $user->attachRole('test-role');
+
         $response = $this->postJson(route('auth.login'), [
             'email' => $user->email,
             'password' => 'password'
         ]);
 
         $response->assertStatus(200);
-        $response->assertJson([
-            'user' => true,
-            'token' => true
+        $response->assertJsonStructure([
+            'data' => [
+                'id'
+            ],
+            'meta' => [
+                'permissions',
+                'roles',
+                'token'
+            ]
         ]);
+        $response->assertJsonPath('meta.roles', ['test-role']);
+        $response->assertJsonPath('meta.permissions', ['test-permission']);
+        $this->assertNotEmpty($response->json()['meta']['token']);
+        $this->assertIsString($response->json()['meta']['token']);
     }
 
-    /**
-     * @todo: fixme
-     */
-    public function _test_logout()
+    public function test_logout()
     {
         $user = factory(User::class)->create();
+        $token = auth()->tokenById($user->id);
+        $headers = ['Authorization' => 'Bearer '.$token];
 
-        $response = $this->postJson(route('auth.login'), [
-            'email' => $user->email,
-            'password' => 'password'
-        ]);
+        $response = $this->getJson(route('auth.logout'), $headers);
+        $response
+            ->assertStatus(201)
+            ->assertJson([
+                'message' => true
+            ]);
 
-        $token = $response['token'];
-
-        $this->getJson(route('auth.logout'), [
-            'Authentication' => 'Bearer '.$token
-        ]);
-
-        $response = $this->getJson(route('auth.status'), [
-            'Authentication' => 'Bearer '.$token
-        ]);
+        $response = $this->getJson(route('auth.status'), $headers);
 
         $response
             ->assertJsonPath('data.id', null);
@@ -178,26 +193,38 @@ class AuthApiTest extends TestCase
             ->assertJsonPath('data.id', null);
     }
 
-    /**
-     * @todo: fixme
-     */
-    public function _test_status_logged_in()
+    public function test_status_logged_in()
     {
         $user = factory(User::class)->create();
+        $token = auth()->tokenById($user->id);
 
-        $response = $this->postJson(route('auth.login'), [
-            'email' => $user->email,
-            'password' => 'password'
+        $role = Role::create([
+            'name' => 'test-role'
         ]);
-
-        $token = $response['token'];
+        $permission = Permission::create([
+            'name' => 'test-permission'
+        ]);
+        $role->attachPermission($permission);
+        $user->attachRole('test-role');
 
         $response = $this->getJson(route('auth.status'), [
-            'Authentication' => 'Bearer '.$token
+            'Authorization' => 'Bearer '.$token
         ]);
 
-        $response
-            ->assertStatus(200)
-            ->assertJsonPath('data.id', $user->id);
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                'id'
+            ],
+            'meta' => [
+                'permissions',
+                'roles',
+                'token'
+            ]
+        ]);
+        $response->assertJsonPath('meta.roles', ['test-role']);
+        $response->assertJsonPath('meta.permissions', ['test-permission']);
+        $this->assertNotEmpty($response->json()['meta']['token']);
+        $this->assertIsString($response->json()['meta']['token']);
     }
 }

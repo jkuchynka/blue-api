@@ -9,13 +9,17 @@ use App\Auth\Requests\RegisterRequest;
 use App\Auth\Requests\ResetPasswordRequest;
 use App\Auth\Requests\SendResetPasswordRequest;
 use App\Auth\Requests\ValidateVerifyRequest;
+use App\Users\Http\Resources\UserResource;
 use App\Users\Models\User;
 use Auth;
 use Base\Http\Controller;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\JsonResponse;
 use JWTAuth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Psy\Util\Json;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
@@ -24,15 +28,15 @@ class AuthController extends Controller
      * User login attempt, generates JWT token
      *
      * @param  LoginRequest $request
-     * @return Response
+     * @return JsonResponse|UserResource
      */
     public function login(LoginRequest $request)
     {
-        $validated = $request->validated();
+        $data = $request->validated();
 
-        if ( ! $token = JWTAuth::attempt([
-            'email' => $validated['email'],
-            'password' => $validated['password']
+        if (! $token = JWTAuth::attempt([
+            'email' => $data['email'],
+            'password' => $data['password']
         ])) {
             return response()->json([
                 'message' => 'Invalid credentials'
@@ -40,22 +44,43 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        return $this->userResource($user, $token);
+    }
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token
-        ]);
+    /**
+     * Build a user resource
+     *
+     * @param Authenticatable $user
+     * @param string $token
+     * @return UserResource
+     */
+    protected function userResource(Authenticatable $user, string $token)
+    {
+        $permissions = $user->allPermissions()->map(function ($permission) {
+            return $permission->name;
+        });
+        $roles = $user->roles->map(function ($role) {
+            return $role->name;
+        });
+
+        return (new UserResource($user))
+            ->additional([
+                'meta' => [
+                    'permissions' => $permissions,
+                    'roles' => $roles,
+                    'token' => $token
+                ]
+            ]);
     }
 
     /**
      * User logout, invalidates JWT token
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function logout()
     {
-        // dd(auth()->user());
-        auth()->invalidate();
+        auth()->logout();
 
         return response()->json([
             'status' => 'OK',
@@ -64,7 +89,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Publically registers a user.
+     * Publicly registers a user.
      * Workflow is:
      * Store as new user with just email
      * Send verify email
@@ -72,7 +97,7 @@ class AuthController extends Controller
      * User can then login with password
      *
      * @param  RegisterRequest $request
-     * @return Response
+     * @return JsonResponse
      */
     public function register(RegisterRequest $request)
     {
@@ -97,7 +122,7 @@ class AuthController extends Controller
      * Send reset password email to user
      *
      * @param  SendResetPasswordRequest $request
-     * @return Response
+     * @return JsonResponse
      */
     public function sendResetPassword(SendResetPasswordRequest $request)
     {
@@ -121,7 +146,7 @@ class AuthController extends Controller
      * or the reset password email.
      *
      * @param  ResetPasswordRequest $request
-     * @return Response
+     * @return JsonResponse
      */
     public function resetPassword(ResetPasswordRequest $request)
     {
@@ -148,7 +173,7 @@ class AuthController extends Controller
      * Validates a verify signed url
      *
      * @param  ValidateVerifyRequest $request
-     * @return Response
+     * @return JsonResponse
      */
     public function validateVerify(ValidateVerifyRequest $request)
     {
@@ -163,14 +188,18 @@ class AuthController extends Controller
     /**
      * Returns the current user logged in or not status
      *
-     * @return Response
+     * @return UserResource|JsonResponse
      */
     public function status()
     {
         $user = auth()->user();
+        $token = $user ? auth()->tokenById($user->id) : null;
 
-        return $user ? response()->json($user) : response()->json([
-            'id' => null
+        return $user ? $this->userResource($user, $token) : response()->json([
+            'data' => [
+                'id' => null
+            ],
+            'meta' => []
         ]);
     }
 }

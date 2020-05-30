@@ -1,5 +1,5 @@
 name: Auth
-description: Handles authorization and JWT tokens
+description: Handles authentication, authorization and JWT tokens
 version: 0.2
 dependsOn:
   - users
