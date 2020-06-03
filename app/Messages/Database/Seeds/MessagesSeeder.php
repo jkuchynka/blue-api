@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Messages\Database;
+namespace App\Messages\Database\Seeds;
 
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use App\Messages\ContactMessage;
+use App\Messages\Models\ContactMessage;
 
 class MessagesSeeder extends Seeder
 {

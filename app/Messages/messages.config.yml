@@ -1,14 +1,8 @@
 name: Messages
 description: Messaging, contact messages
-version: 0.1
+version: 0.2
 seeds: true
-paths:
-  migrations: Database
-  factories: Database
-  seeds: Database
-  controllers:
 routes:
-  -
-    uri: contacts
-    method: resource
-    uses: ContactMessagesController
+  - { uri: contact-messages, method: resource, uses: ContactMessageController }
+contactMessageEmailTo:
+  - admin@example.org
