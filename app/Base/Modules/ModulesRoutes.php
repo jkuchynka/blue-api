@@ -43,6 +43,8 @@ class ModulesRoutes
                             'update' => $config['name'] . '.update',
                             'destroy' => $config['name'] . '.destroy'
                         ]);
+                        Route::delete($config['uri'], $config['uses'].'@destroyMany')
+                            ->name($config['name'].'.destroyMany');
                     } else {
                         Route::$method($config['uri'], [
                             'as' => $config['name'],

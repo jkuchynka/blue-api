@@ -2,17 +2,16 @@
 
 namespace Base\Tests;
 
-use Base\Http\Controller;
 use Base\Modules\ModulesService;
 use Base\Providers\ModuleServiceProvider;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use JMac\Testing\Traits\AdditionalAssertions;
-use Illuminate\Container\Container;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Support\Str;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication, AdditionalAssertions;
+    use CreatesApplication,
+        AdditionalAssertions;
 
     protected $loadModules = [];
 
@@ -37,7 +36,7 @@ abstract class TestCase extends BaseTestCase
             ModulesService::setEnabledModules($this->loadModules);
         }
         parent::setUp();
+        $this->withoutMiddleware(ThrottleRequests::class);
         $this->beforeTest();
-
     }
 }

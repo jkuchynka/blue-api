@@ -3,6 +3,7 @@
 namespace Base\Tests\Traits;
 
 use Base\Http\QueryBuilder;
+use Illuminate\Support\Str;
 use MongoDB\Driver\Query;
 
 trait TestsApi
@@ -43,7 +44,7 @@ trait TestsApi
     protected function routeParam()
     {
         $parts = explode('\\', $this->model());
-        return strtolower(array_pop($parts));
+        return (string) Str::of(array_pop($parts))->snake();
     }
 
     /**
@@ -153,6 +154,8 @@ trait TestsApi
             ->assertStatus(201)
             ->assertJsonStructure(['data' => $this->responseFields()]);
 
+        $this->assertEquals(1, ($this->model())::count());
+
         return $this;
     }
 
@@ -171,9 +174,11 @@ trait TestsApi
         ]);
 
         $response = $this->json('get', $route);
+        $key = $this->responseFields()[0];
         $response
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => $this->responseFields()]);
+            ->assertJsonStructure(['data' => $this->responseFields()])
+            ->assertJsonPath('data.'.$key, $record->$key);
 
         return $this;
     }
@@ -242,6 +247,32 @@ trait TestsApi
             'params' => [
                 $this->routeParam() => $record->id
             ]
+        ]);
+        $response
+            ->assertStatus(204);
+
+        $this->assertEquals(0, ($this->model())::count());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the delete many api deletes records
+     *
+     * @param  string $route
+     * @return $this
+     */
+    public function assertApiDestroyManySuccess(string $route)
+    {
+        $records = factory($this->model(), 2)->create();
+
+        $route = route($route);
+
+        $ids = $records->map(function ($record) {
+            return $record->id;
+        });
+        $response = $this->deleteJson($route, [
+            'ids' => $ids
         ]);
         $response
             ->assertStatus(204);
