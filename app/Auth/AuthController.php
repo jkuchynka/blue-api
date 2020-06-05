@@ -194,8 +194,9 @@ class AuthController extends Controller
      */
     public function refresh()
     {
+        $user = auth()->user();
         $token = auth()->refresh();
-        return $this->userResource(auth()->user(), $token);
+        return $this->userResource($user, $token);
     }
 
     /**
