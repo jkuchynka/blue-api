@@ -8,10 +8,10 @@ use App\Users\Http\Requests\UserDestroyManyRequest;
 use App\Users\Http\Requests\UserStoreRequest;
 use App\Users\Http\Requests\UserUpdateRequest;
 use App\Users\Http\Resources\UserResource;
-use App\Users\Http\Resources\UserCollection;
 use App\Users\Models\User;
 use Base\Http\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 
@@ -20,11 +20,11 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return UserCollection
+     * @return AnonymousResourceCollection
      */
     public function index()
     {
-        return new UserCollection(
+        return UserResource::collection(
             UserQuery::for(User::class)->jsonPaginate()
         );
     }

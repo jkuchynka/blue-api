@@ -9,7 +9,7 @@ class UserQuery extends QueryBuilder
     /**
      * Get allowed filters
      *
-     * @return array
+     * @return string[]
      */
     public function filters()
     {
@@ -21,9 +21,22 @@ class UserQuery extends QueryBuilder
     }
 
     /**
+     * Get allowed includes
+     *
+     * @return string[]
+     */
+    public function includes()
+    {
+        return [
+            'permissions',
+            'roles'
+        ];
+    }
+
+    /**
      * Get allowed sorts
      *
-     * @return array
+     * @return string[]
      */
     public function sorts()
     {

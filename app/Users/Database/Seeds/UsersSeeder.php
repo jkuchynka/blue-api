@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use App\Users\Models\User;
 
-class UserSeeder extends Seeder
+class UsersSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,11 +16,14 @@ class UserSeeder extends Seeder
     public function run()
     {
         $password = bcrypt('password');
-        User::create([
+        $user = User::create([
             'name' => 'Admin',
-            'email' => 'jason.kuchynka@gmail.com',
+            'email' => 'admin@example.org',
             'email_verified_at' => new Carbon,
             'password' => $password
         ]);
+        $user->attachRole('admin');
+
+        factory(User::class, 12)->create();
     }
 }

@@ -8,23 +8,36 @@ use Base\Tests\TestCase;
 
 class UserQueryTest extends TestCase
 {
+    protected $query;
+
+    protected function beforeTest()
+    {
+        $this->query = UserQuery::for(User::class);
+    }
+
     public function test_it_has_filters()
     {
-        $query = UserQuery::for(User::class);
         $this->assertEquals([
             'id',
             'name',
             'email'
-        ], $query->filters());
+        ], $this->query->filters());
+    }
+
+    public function test_it_has_includes()
+    {
+        $this->assertEquals([
+            'permissions',
+            'roles'
+        ], $this->query->includes());
     }
 
     public function test_it_has_sorts()
     {
-        $query = UserQuery::for(User::class);
         $this->assertEquals([
             'id',
             'name',
             'email'
-        ], $query->sorts());
+        ], $this->query->sorts());
     }
 }
