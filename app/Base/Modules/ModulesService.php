@@ -165,4 +165,22 @@ class ModulesService
     {
         return $this->modules;
     }
+
+    /**
+     * Get the combined version of all modules.
+     * @todo:
+     *      The theory here is that updating the version of a module,
+     *      or adding a module, will change the app-level version and could be used
+     *      for invalidating caches, re-fetching schemas, etc...
+     *
+     * @return float
+     */
+    public function version()
+    {
+        $version = 0.0;
+        foreach ($this->modules as $module) {
+            $version += (float) $module['version'];
+        }
+        return (string) $version;
+    }
 }
