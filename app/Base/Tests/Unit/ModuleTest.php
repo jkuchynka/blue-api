@@ -23,4 +23,17 @@ class ModuleTest extends \Base\Tests\TestCase
         $module->setDefaultConfig('base');
         $this->assertEquals('Base', $module['namespace']);
     }
+
+    public function test_class_fully_namespaced()
+    {
+        $module = new Module;
+        $module->setDefaultConfig('foo');
+        $module['paths.bar'] = 'Bar';
+
+        $this->assertEquals('App\\Foo\\Bar\\Baz', $module->classFullyNamespaced('Baz', 'bar'));
+
+        $this->assertEquals('App\\Foo\\Bar\\Baz', $module->classFullyNamespaced('App\\Foo\\Bar\\Baz', 'bar'));
+
+        $this->assertEquals('App\\Foo\\Bar\\Baz\\Qux', $module->classFullyNamespaced('Baz\\Qux', 'bar'));
+    }
 }

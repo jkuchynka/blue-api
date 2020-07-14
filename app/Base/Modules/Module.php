@@ -75,6 +75,27 @@ class Module extends Dot
     }
 
     /**
+     * Get a fully namespaced class
+     *
+     * @param string $class
+     * @param string $type
+     *   Path type
+     * @return string
+     */
+    public function classFullyNamespaced(string $class, string $type)
+    {
+        $base = $this->namespace();
+        // Check if class is already fully namespaced
+        if (preg_match('/^'.Str::of($base)->replace('\\', '\\\\').'/', $class)) {
+            return $class;
+        }
+        return Common::namespaceCombine(
+            $this->namespace($type),
+            $class
+        );
+    }
+
+    /**
      * Get the full module path for a type
      *
      * @param string $type

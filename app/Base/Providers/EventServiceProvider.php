@@ -29,6 +29,15 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
+        // Get module subscribers
+        $subscribers = [];
+        $modulesService = $this->app['modules'];
+        $modules = $modulesService->getModules();
+        foreach ($modules as $module) {
+            foreach ($module->get('subscribers', []) as $subscriber) {
+                $subscriber = $module->classFullyNamespaced($subscriber, 'listeners');
+                Event::subscribe($subscriber);
+            }
+        }
     }
 }
