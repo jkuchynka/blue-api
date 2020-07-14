@@ -12,6 +12,7 @@ routes:
   - { uri: register, method: post }
   - { uri: refresh, method: post }
   - { uri: reset-password, method: put }
+  - { uri: roles, uses: RoleController@index }
   - { uri: send-reset-password, method: post }
   - { uri: status }
   - { uri: validate-verify, method: post }
@@ -19,3 +20,5 @@ routes:
 verify_expiration:
   registration: 1 day
   reset_password: 3 hours
+subscribers:
+  - AuthEventSubscriber
