@@ -12,13 +12,22 @@ use App\Users\Models\User;
 use Base\Http\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
+use Mail;
+use Str;
 
+/**
+ * Users management
+ *
+ * @group Users
+ * @authenticated
+ */
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get users
+     *
+     * @queryBuilder App\Users\Http\Queries\UserQuery
+     * @paginates
      *
      * @return AnonymousResourceCollection
      */
@@ -30,9 +39,11 @@ class UserController extends Controller
     }
 
     /**
-     * Create a new user outside of registration process,
-     * such as by an admin.
+     * Create a user
+     * Used outside of registration process, such as by an admin.
      * Sends user a verification email.
+     *
+     * @usesModel User
      *
      * @param UserStoreRequest $request
      * @return UserResource
@@ -56,13 +67,15 @@ class UserController extends Controller
     }
 
     /**
-     * Return a user
+     * Get a user
      *
+     * @urlParam user required The user id
      * @param User $user
      * @return UserResource
      */
     public function show(User $user)
     {
+        $user->load('roles');
         return new UserResource($user);
     }
 
@@ -75,7 +88,12 @@ class UserController extends Controller
      */
     public function update(UserUpdateRequest $request, User $user)
     {
-        $user->update($request->validated());
+        $data = $request->validated();
+        $user->update($data);
+        if (isset($data['roles'])) {
+            $user->syncRoles($data['roles']);
+        }
+        $user->load('roles');
         return new UserResource($user);
     }
 

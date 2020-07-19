@@ -19,9 +19,13 @@ class UserQueryTest extends TestCase
     {
         $this->assertEquals([
             'id',
+            'username',
             'name',
-            'email'
-        ], $this->query->filters());
+            'email',
+            'created_at',
+            'updated_at',
+            'roles.id'
+        ], array_keys($this->query->filters()));
     }
 
     public function test_it_has_includes()
@@ -36,6 +40,7 @@ class UserQueryTest extends TestCase
     {
         $this->assertEquals([
             'id',
+            'username',
             'name',
             'email'
         ], $this->query->sorts());

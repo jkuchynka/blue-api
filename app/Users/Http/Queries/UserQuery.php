@@ -3,20 +3,25 @@
 namespace App\Users\Http\Queries;
 
 use Base\Http\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class UserQuery extends QueryBuilder
 {
     /**
      * Get allowed filters
      *
-     * @return string[]
+     * @return array
      */
     public function filters()
     {
         return [
-            'id',
-            'name',
-            'email'
+            'id' => ['=', '>', '>=', '<', '<='],
+            'username' => ['*', '=', '!'],
+            'name' => ['*', '=', '!'],
+            'email' => ['*'],
+            'created_at' => ['>', '>=', '<', '<='],
+            'updated_at' => ['>', '>=', '<', '<='],
+            'roles.id' => ['=', '!']
         ];
     }
 
@@ -42,6 +47,7 @@ class UserQuery extends QueryBuilder
     {
         return [
             'id',
+            'username',
             'name',
             'email'
         ];

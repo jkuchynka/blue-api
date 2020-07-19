@@ -7,3 +7,5 @@ seeds: true
 seedsWeight: 0
 routes:
   - { uri: /users, method: resource, model: User, uses: UserController }
+admin:
+  enabled: true

@@ -34,6 +34,7 @@ class UsersApiTest extends TestCase
     {
         return [
             'id',
+            'username',
             'name',
             'email',
             'created_at',
@@ -125,6 +126,18 @@ class UsersApiTest extends TestCase
     public function test_show()
     {
         $this->assertApiShow('users.show');
+    }
+
+    public function test_show_by_username()
+    {
+        $user = factory(User::class)->create();
+        $route = route('users.show', [
+            $this->routeParam() => $user->username
+        ]);
+        $response = $this->getJson($route);
+        $response
+            ->assertStatus(200)
+            ->assertJsonPath('data.id', $user->id);
     }
 
     /**

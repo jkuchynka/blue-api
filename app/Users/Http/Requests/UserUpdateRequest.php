@@ -2,10 +2,26 @@
 
 namespace App\Users\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Users\Models\User;
+use Base\Http\FormRequest;
 
 class UserUpdateRequest extends FormRequest
 {
+    /**
+     * Get the model this validates against
+     *
+     * @return string
+     */
+    public function model()
+    {
+        return User::class;
+    }
+
+    public function relations()
+    {
+        return ['roles', 'permissions'];
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      * @todo: If user has admin, allowed role or user_owned
@@ -15,18 +31,5 @@ class UserUpdateRequest extends FormRequest
     public function authorize()
     {
         return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
-    {
-        return [
-            'email' => 'required|email',
-            'name' => 'required'
-        ];
     }
 }

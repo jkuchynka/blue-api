@@ -2,22 +2,29 @@
 
 namespace App\Users\Models;
 
+use App\Users\Rules\Username;
+use Base\Traits\BaseModel;
+use Base\Traits\DefinesFields;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Laratrust\Traits\LaratrustUserTrait;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     use LaratrustUserTrait;
     use Notifiable;
+    use BaseModel;
+    use DefinesFields;
 
     /**
-     * The attributes that aren't mass assignable.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'username', 'name', 'email'
+    ];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -36,6 +43,30 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Define fields
+     *
+     * @return array
+     */
+    public static function fields()
+    {
+        return [
+            'id' => 'id',
+            'username' => 'string|nullable|unique|'.Username::class,
+            'name' => 'string|nullable|required',
+            'email' => 'string|unique|required|email',
+            'email_verified_at' => 'timestamp|nullable',
+            'password' => 'string|hidden',
+            'remember_token' => 'string|max:100',
+            'timestamps' => 'timestamps'
+        ];
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where('id', $value)->orWhere('username', $value)->first();
+    }
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
