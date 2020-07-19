@@ -4,9 +4,8 @@ namespace App\Filtersets\Http\Requests;
 
 use App\Filtersets\Models\Filterset;
 use Base\Http\FormRequest;
-use Laratrust;
 
-class FiltersetStoreRequest extends FormRequest
+class FiltersetUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,7 +14,8 @@ class FiltersetStoreRequest extends FormRequest
      */
     public function authorize()
     {
-        return Laratrust::isAbleTo('save-filtersets');
+        return true;
+        return false;
     }
 
     /**

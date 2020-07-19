@@ -2,11 +2,16 @@
 
 namespace App\Filtersets\Http\Controllers;
 
+use App\Filtersets\Http\Queries\FiltersetQuery;
+use App\Filtersets\Http\Requests\FiltersetDestroyRequest;
 use App\Filtersets\Http\Requests\FiltersetStoreRequest;
+use App\Filtersets\Http\Requests\FiltersetUpdateRequest;
 use App\Filtersets\Http\Resources\FiltersetResource;
 use App\Filtersets\Models\Filterset;
+use App\Filtersets\Models\FiltersetFilter;
 use Base\Http\Controller;
 use Base\Http\Filters\FiltersAll;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -75,7 +80,9 @@ class FiltersetsController extends Controller
         $filterset->user_id = auth()->user()->id;
         $filterset->save();
 
-        $filterset->filters()->createMany($data['filters']);
+        if (isset($data['filters'])) {
+            $filterset->filters()->createMany($data['filters']);
+        }
         $filterset->filters;
 
         return new FiltersetResource($filterset);
@@ -96,33 +103,56 @@ class FiltersetsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param FiltersetUpdateRequest $request
+     * @param Filterset $filterset
+     * @return FiltersetResource
      */
-    public function update(Request $request, $id)
+    public function update(FiltersetUpdateRequest $request, Filterset $filterset)
     {
-        $request->validate($this->rules(true));
-        $record = Model::findOrFail($id);
-        $record->fill($request->all());
-        $record->save();
-        return response()->json($record);
+        $data = $request->validated();
+        $filterset->update($data);
+
+        if (isset($data['filters'])) {
+            $ids = [];
+            foreach ($filterset->filters as $filter) {
+                $ids[] = $filter->id;
+            }
+            $existing = [];
+            foreach ($data['filters'] as $filterData) {
+                if (!empty($filterData['id'])) {
+                    $existing[] = $filterData['id'];
+                    $filter = FiltersetFilter::find($filterData['id']);
+                    $filter->update($filterData);
+                } else {
+                    $filter = new FiltersetFilter;
+                    $filter->fill($filterData);
+                    $filter->filterset_id = $filterset->id;
+                    $filter->save();
+                }
+            }
+            $remove = array_diff($ids, $existing);
+            FiltersetFilter::whereIn('id', $remove)->delete();
+        }
+
+        $filterset->load('filters');
+
+        return new FiltersetResource($filterset);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param FiltersetDestroyRequest $request
+     * @param Filterset $filterset
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(FiltersetDestroyRequest $request, Filterset $filterset)
     {
-        $record = Model::findOrFail($id);
-        $record->delete();
+        $filterset->delete();
         return response()->json([
             'success' => true,
             'message' => 'Record deleted.'
-        ]);
+        ], 204);
     }
 
     /**

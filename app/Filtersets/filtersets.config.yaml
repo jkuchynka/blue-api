@@ -1,6 +1,7 @@
 name: Filtersets
 description: Filtersets are user stored groups of filters, that can be used to quickly apply filters to tables or lists.
-version: 0.1
+version: 0.2
+dependsOn: [auth, admin, users]
 
 routes:
   - { uri: '', method: resource }
@@ -8,6 +9,6 @@ routes:
 permissions:
   -
     name: save-filtersets
-    display_name: Save filtersets Yo
+    display_name: Save filtersets
     description: Allow saving filtersets
     roles: [ admin, editor ]

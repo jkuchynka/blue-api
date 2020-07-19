@@ -20,6 +20,11 @@ class CreateFiltersetFiltersTable extends Migration
             $table->string('value')->nullable();
             $table->integer('filterset_id');
             $table->timestamps();
+
+            $table->foreign('filterset_id')
+                  ->references('id')
+                  ->on('filtersets')
+                  ->cascadeOnDelete();
         });
     }
 

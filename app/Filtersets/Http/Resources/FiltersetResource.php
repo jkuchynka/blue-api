@@ -22,7 +22,18 @@ class FiltersetResource extends JsonResource
             'user_id' => $this->user_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'filters' => $this->whenLoaded('filters')
+            'filters' => $this->whenLoaded('filters', function () {
+                return $this->filters->map(function ($filter) {
+                    return [
+                        'id' => $filter->id,
+                        'field' => $filter->field,
+                        'operator' => $filter->operator,
+                        'value' => $filter->value,
+                        'created_at' => $filter->created_at,
+                        'updated_at' => $filter->updated_at
+                    ];
+                });
+            })
         ];
     }
 }
