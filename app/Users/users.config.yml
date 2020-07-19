@@ -1,6 +1,6 @@
 name: Users
 description: Users module
-version: 0.2
+version: 0.3
 dependsOn:
   - auth
 seeds: true
