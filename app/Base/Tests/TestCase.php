@@ -2,8 +2,8 @@
 
 namespace Base\Tests;
 
+use App\Users\Models\User;
 use Base\Modules\ModulesService;
-use Base\Providers\ModuleServiceProvider;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use JMac\Testing\Traits\AdditionalAssertions;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -14,6 +14,8 @@ abstract class TestCase extends BaseTestCase
         AdditionalAssertions;
 
     protected $loadModules = [];
+
+    protected $user;
 
     /**
      * Runs before each test
@@ -36,7 +38,21 @@ abstract class TestCase extends BaseTestCase
             ModulesService::setEnabledModules($this->loadModules);
         }
         parent::setUp();
+        $this->user = null;
         $this->withoutMiddleware(ThrottleRequests::class);
         $this->beforeTest();
+    }
+
+    /**
+     * Create a user with an assigned role, and execute test as this user
+     *
+     * @param string $role
+     */
+    protected function asUserByRole($role)
+    {
+        $user = factory(User::class)->create();
+        $user->attachRoles([$role]);
+        $this->user = $user;
+        $this->actingAs($user);
     }
 }
