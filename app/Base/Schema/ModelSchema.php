@@ -2,7 +2,7 @@
 
 namespace Base\Schema;
 
-use Base\Model;
+use Illuminate\Database\Eloquent\Model;
 
 class ModelSchema
 {
