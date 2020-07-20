@@ -3,6 +3,7 @@
 namespace App\Filtersets\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Laratrust;
 
 class FiltersetDestroyRequest extends FormRequest
 {
@@ -13,8 +14,7 @@ class FiltersetDestroyRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
-        return false;
+        return Laratrust::isAbleTo('save-filtersets');
     }
 
     /**

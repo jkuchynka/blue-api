@@ -18,7 +18,7 @@ class CreateFiltersetFiltersTable extends Migration
             $table->string('field');
             $table->string('operator');
             $table->string('value')->nullable();
-            $table->integer('filterset_id');
+            $table->bigInteger('filterset_id')->unsigned();
             $table->timestamps();
 
             $table->foreign('filterset_id')

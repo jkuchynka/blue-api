@@ -4,6 +4,7 @@ namespace App\Filtersets\Http\Requests;
 
 use App\Filtersets\Models\Filterset;
 use Base\Http\FormRequest;
+use Laratrust;
 
 class FiltersetUpdateRequest extends FormRequest
 {
@@ -14,8 +15,7 @@ class FiltersetUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
-        return false;
+        return Laratrust::isAbleTo('save-filtersets');
     }
 
     /**

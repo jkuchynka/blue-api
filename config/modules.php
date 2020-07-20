@@ -13,6 +13,7 @@ return [
 
     // Enabled modules, can override settings here
     'modules' => [
+        'auth' => [],
         'base' => [],
         'filtersets' => [],
         'messages' => [],
