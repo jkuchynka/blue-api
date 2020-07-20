@@ -9,3 +9,21 @@ routes:
   - { uri: /users, method: resource, model: User, uses: UserController }
 admin:
   enabled: true
+
+roles:
+  -
+    name: admin
+    display_name: Administrator
+    description: Site administrator
+
+  -
+    name: editor
+    display_name: Editor
+    description: Editor
+
+permissions:
+  -
+    name: access-administration
+    display_name: Access Administration
+    description: Allow access to site administration
+    roles: [admin, editor]
