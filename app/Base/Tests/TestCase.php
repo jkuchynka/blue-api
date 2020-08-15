@@ -44,6 +44,17 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Execute test as a user
+     *
+     * @param User $user
+     */
+    protected function asUser(User $user)
+    {
+        $this->user = $user;
+        $this->actingAs($user);
+    }
+
+    /**
      * Create a user with an assigned role, and execute test as this user
      *
      * @param string $role
@@ -52,7 +63,6 @@ abstract class TestCase extends BaseTestCase
     {
         $user = factory(User::class)->create();
         $user->attachRoles([$role]);
-        $this->user = $user;
-        $this->actingAs($user);
+        $this->asUser($user);
     }
 }
