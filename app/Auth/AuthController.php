@@ -8,6 +8,7 @@ use App\Auth\Requests\LoginRequest;
 use App\Auth\Requests\RegisterRequest;
 use App\Auth\Requests\ResetPasswordRequest;
 use App\Auth\Requests\SendResetPasswordRequest;
+use App\Auth\Requests\UpdatePasswordRequest;
 use App\Auth\Requests\ValidateVerifyRequest;
 use App\Users\Http\Resources\UserResource;
 use App\Users\Models\User;
@@ -105,10 +106,10 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $user = User::create([
-            'email' => $validated['email'],
-            'password' => Hash::make(Str::random(10))
-        ]);
+        $user = new User;
+        $user->email = $validated['email'];
+        $user->password = Hash::make(Str::random(10));
+        $user->save();
 
         Mail::to([
             ['email' => $user->email]
@@ -168,6 +169,26 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'OK',
             'message' => $emailVerified ? 'User email verified and password set.' : 'User password set.'
+        ], 201);
+    }
+
+    /**
+     * Updates the authenticated user's password
+     *
+     * @param UpdatePasswordRequest $request
+     * @return JsonResponse
+     */
+    public function updatePassword(UpdatePasswordRequest $request)
+    {
+        $data = $request->validated();
+
+        $user = Auth::user();
+        $user->password = Hash::make($data['password']);
+        $user->save();
+
+        return response()->json([
+            'status' => 'OK',
+            'message' => 'Your password has been updated.'
         ], 201);
     }
 

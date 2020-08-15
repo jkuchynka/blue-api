@@ -152,6 +152,31 @@ class AuthApiTest extends TestCase
         $this->assertTrue(Hash::check('foobar123', $user->password));
     }
 
+    public function test_update_password()
+    {
+        $user = factory(User::class)->create([
+            'password' => Hash::make('secret123')
+        ]);
+
+        $this->asUser($user);
+
+        $response = $this->putJson(route('auth.updatePassword'), [
+            'current_password' => 'secret123',
+            'password' => 'password321',
+            'password_confirm' => 'password321'
+        ]);
+
+        $response
+            ->assertStatus(201)
+            ->assertJson([
+                'message' => true
+            ]);
+
+        $user = User::where('id', $user->id)->first();
+
+        $this->assertTrue(Hash::check('password321', $user->password));
+    }
+
     public function test_verify()
     {
         $user = factory(User::class)->create([

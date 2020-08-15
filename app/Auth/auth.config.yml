@@ -1,6 +1,6 @@
 name: Auth
 description: Handles authentication, authorization and JWT tokens
-version: 0.4
+version: 0.5
 dependsOn:
   - users
 paths:
@@ -15,6 +15,7 @@ routes:
   - { uri: roles, uses: RoleController@index }
   - { uri: send-reset-password, method: post }
   - { uri: status }
+  - { uri: update-password, method: put }
   - { uri: validate-verify, method: post }
   - { uri: verify, method: post }
 verify_expiration:
