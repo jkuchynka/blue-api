@@ -1,12 +1,14 @@
 name: Users
 description: Users module
-version: 0.4
+version: 0.5
 dependsOn:
   - auth
 seeds: true
 seedsWeight: 0
 routes:
   - { uri: /users, method: resource, model: User, uses: UserController }
+  - { uri: /users/:user/image, method: post, uses: ImageController@store }
+
 admin:
   enabled: true
 
