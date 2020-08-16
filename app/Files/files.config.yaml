@@ -1,0 +1,8 @@
+name: Files
+description: Manages files such as documents and images. Handles uploading and serving files.
+version: 0.1
+dependsOn: [users]
+seeds: true
+
+routes:
+  - { uri: '', method: resource, uses: FileController }
