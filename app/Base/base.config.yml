@@ -1,6 +1,6 @@
 name: Base
 description: Base module for the Blue API
-version: 0.2
+version: 0.3
 paths:
   migrations: Database
 routes:

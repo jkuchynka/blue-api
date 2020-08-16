@@ -32,7 +32,9 @@ class DatabaseSeeder extends Seeder
                 $groupedSeeds->push($weight, $class);
             }
         }
-        foreach ($groupedSeeds as $weight => $seeds) {
+        $groups = $groupedSeeds->get();
+        ksort($groups);
+        foreach ($groups as $weight => $seeds) {
             foreach ($seeds as $class) {
                 $this->call($class);
             }
