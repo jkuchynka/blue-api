@@ -66,6 +66,9 @@ class ModulesRoutes
             $uri = $uri ? $prefix . '/' . $uri : $prefix;
         }
 
+        // Convert :param syntax to {param}
+        $uri = preg_replace('/:([^\/]*)/', '{$1}', $uri);
+
         // Method defaults to get
         $method = isset($route['method']) ? strtolower($route['method']) : 'get';
 

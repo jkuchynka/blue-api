@@ -18,14 +18,18 @@ abstract class FormRequest extends BaseFormRequest
      *
      * @return string
      */
-    abstract public function model();
+    public function model()
+    {
+        return;
+    }
 
     /**
      * Get the available relations
      *
      * @return array
      */
-    public function relations() {
+    public function relations()
+    {
         return [];
     }
 
